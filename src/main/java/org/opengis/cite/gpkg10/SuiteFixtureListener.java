@@ -9,10 +9,8 @@ import java.util.logging.Level;
 import org.opengis.cite.gpkg10.util.ClientUtils;
 import org.opengis.cite.gpkg10.util.TestSuiteLogger;
 import org.opengis.cite.gpkg10.util.URIUtils;
-import org.opengis.cite.gpkg10.util.XMLUtils;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
-import org.w3c.dom.Document;
 
 import com.sun.jersey.api.client.Client;
 
@@ -44,9 +42,9 @@ public class SuiteFixtureListener implements ISuiteListener {
 
     /**
      * Processes test suite arguments and sets suite attributes accordingly. The
-     * entity referenced by the {@link TestRunArg#IUT iut} argument is parsed
-     * and the resulting Document is set as the value of the "testSubject"
-     * attribute.
+     * entity referenced by the {@link TestRunArg#IUT iut} argument is retrieved
+     * and written to a File that is set as the value of the suite attribute
+     * {@link SuiteAttribute#TEST_SUBJ_FILE testSubjectFile}.
      * 
      * @param suite
      *            An ISuite object representing a TestNG test suite.
@@ -59,26 +57,15 @@ public class SuiteFixtureListener implements ISuiteListener {
             throw new IllegalArgumentException("Required test run parameter not found: " + TestRunArg.IUT.toString());
         }
         URI iutRef = URI.create(iutParam.trim());
-        File entityFile = null;
+        File gpkgFile = null;
         try {
-            entityFile = URIUtils.dereferenceURI(iutRef);
+            gpkgFile = URIUtils.dereferenceURI(iutRef);
         } catch (IOException iox) {
             throw new RuntimeException("Failed to dereference resource located at " + iutRef, iox);
         }
-        suite.setAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName(), entityFile);
-        Document iutDoc = null;
-        try {
-            iutDoc = URIUtils.parseURI(entityFile.toURI());
-        } catch (Exception x) {
-            throw new RuntimeException("Failed to parse resource retrieved from " + iutRef, x);
-        }
-        suite.setAttribute(SuiteAttribute.TEST_SUBJECT.getName(), iutDoc);
-        if (TestSuiteLogger.isLoggable(Level.FINE)) {
-            StringBuilder logMsg = new StringBuilder("Parsed resource retrieved from ");
-            logMsg.append(iutRef).append("\n");
-            logMsg.append(XMLUtils.writeNodeToString(iutDoc));
-            TestSuiteLogger.log(Level.FINE, logMsg.toString());
-        }
+        TestSuiteLogger.log(Level.FINE, String.format("Wrote test subject to file: %s (%d bytes)",
+                gpkgFile.getAbsolutePath(), gpkgFile.length()));
+        suite.setAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName(), gpkgFile);
     }
 
     /**

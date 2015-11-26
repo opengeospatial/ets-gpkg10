@@ -19,4 +19,5 @@ public class ErrorMessageKeys {
     public static final String UNEXPECTED_STATUS = "UnexpectedStatus";
     public static final String UNEXPECTED_MEDIA_TYPE = "UnexpectedMediaType";
     public static final String MISSING_ENTITY = "MissingEntity";
+    public static final String INVALID_HEADER_STR = "InvalidHeaderString";
 }

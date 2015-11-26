@@ -5,7 +5,7 @@
 This test suite verifies the structure and content of a GeoPackage 1.0 data container. 
 The [GeoPackage specification](http://www.geopackage.org/spec/) describes how a 
 platform-independent [SQLite database file](https://www.sqlite.org/fileformat2.html) 
-may contain various types of content:
+may contain various types of content, including:
 
 * vector geospatial features
 * tile matrix sets of imagery and raster maps at various scales
@@ -15,16 +15,10 @@ Visit the [project documentation website](http://opengeospatial.github.io/ets-gp
 for more information, including the API documentation.
 
 ### How to run the tests
-There are several options for executing the test suite.
+The test suite is built using [Apache Maven v3](https://maven.apache.org/). The options 
+for running the suite are summarized below.
 
-#### 1. OGC test harness
-
-Use [TEAM Engine](https://github.com/opengeospatial/teamengine), the official OGC test harness.
-The latest test suite release are usually available at the [beta testing facility](http://cite.opengeospatial.org/te2/). 
-You can also [build and deploy](https://github.com/opengeospatial/teamengine) the test 
-harness yourself and use a local installation.
-
-#### 2. Integrated development environment (IDE)
+#### 1. Integrated development environment (IDE)
 
 Use a Java IDE such as Eclipse, NetBeans, or IntelliJ. Clone the repository and build the project.
 
@@ -48,13 +42,20 @@ You can modify the sample file in `src/main/config/test-run-props.xml`
 The TestNG results file (`testng-results.xml`) will be written to a subdirectory
 in `${user.home}/testng/` having a UUID value as its name.
 
-#### 3. Command shell (console)
+#### 2. Command shell (console)
 
 One of the build artifacts is an "all-in-one" JAR file that includes the test 
 suite and all of its dependencies; this makes it very easy to execute the test 
 suite in a command shell:
 
 `java -jar ets-gpkg10-0.1-SNAPSHOT-aio.jar [-o|--outputDir $TMPDIR] [test-run-props.xml]`
+
+#### 3. OGC test harness
+
+Use [TEAM Engine](https://github.com/opengeospatial/teamengine), the official OGC test harness.
+The latest test suite release are usually available at the [beta testing facility](http://cite.opengeospatial.org/te2/). 
+You can also [build and deploy](https://github.com/opengeospatial/teamengine) the test 
+harness yourself and use a local installation.
 
 
 ### How to contribute

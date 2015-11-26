@@ -8,11 +8,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPathExpressionException;
-import junit.framework.Assert;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -42,33 +42,26 @@ public class VerifyXMLUtils {
 
     @Test
     public void writeDocToString() throws SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         String content = XMLUtils.writeNodeToString(doc);
-        Assert.assertTrue("String should start with '<feed'",
-                content.startsWith("<feed"));
+        Assert.assertTrue("String should start with '<feed'", content.startsWith("<feed"));
     }
 
     @Test
-    public void evaluateXPathExpression_match()
-            throws XPathExpressionException, SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+    public void evaluateXPathExpression_match() throws XPathExpressionException, SAXException, IOException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         String expr = "/tns:feed/tns:author[ns1:phone]";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(ATOM_NS, "tns");
         nsBindings.put(EX_NS, "ns1");
         NodeList results = XMLUtils.evaluateXPath(doc, expr, nsBindings);
-        Assert.assertTrue("Expected 1 node in results.",
-                results.getLength() == 1);
+        Assert.assertTrue("Expected 1 node in results.", results.getLength() == 1);
         Assert.assertEquals("author", results.item(0).getLocalName());
     }
 
     @Test
-    public void evaluateXPathExpression_noMatch()
-            throws XPathExpressionException, SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+    public void evaluateXPathExpression_noMatch() throws XPathExpressionException, SAXException, IOException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         String expr = "/tns:feed/tns:author[ns1:blog]";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(ATOM_NS, "tns");
@@ -78,10 +71,8 @@ public class VerifyXMLUtils {
     }
 
     @Test(expected = XPathExpressionException.class)
-    public void evaluateXPathExpression_booleanResult()
-            throws XPathExpressionException, SAXException, IOException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+    public void evaluateXPathExpression_booleanResult() throws XPathExpressionException, SAXException, IOException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         String expr = "count(//tns:entry) > 0";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(ATOM_NS, "tns");
@@ -99,31 +90,27 @@ public class VerifyXMLUtils {
     }
 
     @Test
-    public void evaluateXPath2ExpressionAgainstDocument() throws SAXException,
-            IOException, SaxonApiException, XPathException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+    public void evaluateXPath2ExpressionAgainstDocument()
+            throws SAXException, IOException, SaxonApiException, XPathException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         String expr = "matches(//tns:entry/tns:title, '.*Robots')";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(ATOM_NS, "tns");
-        XdmValue result = XMLUtils.evaluateXPath2(new DOMSource(doc), expr,
-                nsBindings);
+        XdmValue result = XMLUtils.evaluateXPath2(new DOMSource(doc), expr, nsBindings);
         Assert.assertTrue("Expected non-empty result.", result.size() > 0);
         Assert.assertEquals("Result has unexpected string value.", "true",
                 result.getUnderlyingValue().getStringValue());
     }
 
     @Test
-    public void evaluateXPath2ExpressionAgainstElement() throws SAXException,
-            IOException, SaxonApiException, XPathException {
-        Document doc = docBuilder.parse(this.getClass().getResourceAsStream(
-                "/atom-feed.xml"));
+    public void evaluateXPath2ExpressionAgainstElement()
+            throws SAXException, IOException, SaxonApiException, XPathException {
+        Document doc = docBuilder.parse(this.getClass().getResourceAsStream("/atom-feed.xml"));
         Node entry = doc.getElementsByTagNameNS(ATOM_NS, "entry").item(0);
         String expr = "matches(tns:title, '.*Robots')";
         Map<String, String> nsBindings = new HashMap<String, String>();
         nsBindings.put(ATOM_NS, "tns");
-        XdmValue result = XMLUtils.evaluateXPath2(new DOMSource(entry), expr,
-                nsBindings);
+        XdmValue result = XMLUtils.evaluateXPath2(new DOMSource(entry), expr, nsBindings);
         Assert.assertTrue("Expected non-empty result.", result.size() > 0);
         Assert.assertEquals("Result has unexpected string value.", "true",
                 result.getUnderlyingValue().getStringValue());
@@ -133,15 +120,13 @@ public class VerifyXMLUtils {
     public void expandCharacterEntity() {
         String text = "Ce n&apos;est pas";
         String result = XMLUtils.expandReferencesInText(text);
-        Assert.assertTrue("Expected result to contain an apostrophe (')",
-                result.contains("'"));
+        Assert.assertTrue("Expected result to contain an apostrophe (')", result.contains("'"));
     }
 
     @Test
     public void expandNumericCharacterReference() {
         String text = "Montr&#xe9;al";
         String result = XMLUtils.expandReferencesInText(text);
-        Assert.assertEquals("Expected result to contain character é (U+00E9)",
-                "Montréal", result);
+        Assert.assertEquals("Expected result to contain character é (U+00E9)", "Montréal", result);
     }
 }
