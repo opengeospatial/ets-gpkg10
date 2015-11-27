@@ -37,7 +37,7 @@ public class VerifySQLiteContainerTests {
         File dataFile = new File(gpkgUrl.toURI());
         when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
         SQLiteContainerTests iut = new SQLiteContainerTests();
-        iut.initFixture(testContext);
+        iut.initCommonFixture(testContext);
         iut.fileHeaderString();
     }
 
@@ -47,7 +47,7 @@ public class VerifySQLiteContainerTests {
         File dataFile = new File(gpkgUrl.toURI());
         when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
         SQLiteContainerTests iut = new SQLiteContainerTests();
-        iut.initFixture(testContext);
+        iut.initCommonFixture(testContext);
         iut.applicationID();
     }
 }

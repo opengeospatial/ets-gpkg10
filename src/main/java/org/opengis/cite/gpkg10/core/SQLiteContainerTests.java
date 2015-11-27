@@ -1,25 +1,15 @@
 package org.opengis.cite.gpkg10.core;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.Arrays;
 
-import javax.sql.DataSource;
-
+import org.opengis.cite.gpkg10.CommonFixture;
 import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
 import org.opengis.cite.gpkg10.GPKG10;
-import org.opengis.cite.gpkg10.SuiteAttribute;
-import org.sqlite.SQLiteConfig;
-import org.sqlite.SQLiteConfig.JournalMode;
-import org.sqlite.SQLiteConfig.SynchronousMode;
-import org.sqlite.SQLiteDataSource;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -38,27 +28,7 @@ import org.testng.annotations.Test;
  * Database File Format</a></li>
  * </ul>
  */
-public class SQLiteContainerTests {
-
-    private File gpkgFile;
-    private DataSource dataSource;
-
-    @BeforeClass
-    public void initFixture(ITestContext testContext) throws SQLException {
-        Object testFile = testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName());
-        if (null == testFile || !File.class.isInstance(testFile)) {
-            throw new IllegalArgumentException(
-                    String.format("Suite attribute value is not a File: %s", SuiteAttribute.TEST_SUBJ_FILE.getName()));
-        }
-        this.gpkgFile = File.class.cast(testFile);
-        SQLiteConfig dbConfig = new SQLiteConfig();
-        dbConfig.setSynchronous(SynchronousMode.OFF);
-        dbConfig.setJournalMode(JournalMode.MEMORY);
-        dbConfig.enforceForeignKeys(true);
-        SQLiteDataSource sqliteSource = new SQLiteDataSource(dbConfig);
-        sqliteSource.setUrl("jdbc:sqlite:" + this.gpkgFile.getPath());
-        this.dataSource = sqliteSource;
-    }
+public class SQLiteContainerTests extends CommonFixture {
 
     /**
      * A GeoPackage shall be a SQLite database file using version 3 of the

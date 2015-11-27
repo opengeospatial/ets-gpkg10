@@ -6,13 +6,10 @@ import java.net.URI;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.opengis.cite.gpkg10.util.ClientUtils;
 import org.opengis.cite.gpkg10.util.TestSuiteLogger;
 import org.opengis.cite.gpkg10.util.URIUtils;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
-
-import com.sun.jersey.api.client.Client;
 
 /**
  * A listener that performs various tasks before and after a test suite is run,
@@ -32,7 +29,6 @@ public class SuiteFixtureListener implements ISuiteListener {
     @Override
     public void onStart(ISuite suite) {
         processSuiteParameters(suite);
-        registerClientComponent(suite);
     }
 
     @Override
@@ -66,21 +62,6 @@ public class SuiteFixtureListener implements ISuiteListener {
         TestSuiteLogger.log(Level.FINE, String.format("Wrote test subject to file: %s (%d bytes)",
                 gpkgFile.getAbsolutePath(), gpkgFile.length()));
         suite.setAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName(), gpkgFile);
-    }
-
-    /**
-     * A client component is added to the suite fixture as the value of the
-     * {@link SuiteAttribute#CLIENT} attribute; it may be subsequently accessed
-     * via the {@link org.testng.ITestContext#getSuite()} method.
-     *
-     * @param suite
-     *            The test suite instance.
-     */
-    void registerClientComponent(ISuite suite) {
-        Client client = ClientUtils.buildClient();
-        if (null != client) {
-            suite.setAttribute(SuiteAttribute.CLIENT.getName(), client);
-        }
     }
 
     /**

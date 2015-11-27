@@ -41,14 +41,11 @@ public class URIUtils {
      * @throws IOException
      *             If the resource is not accessible.
      */
-    public static Document parseURI(URI uriRef) throws SAXException,
-            IOException {
+    public static Document parseURI(URI uriRef) throws SAXException, IOException {
         if ((null == uriRef) || !uriRef.isAbsolute()) {
-            throw new IllegalArgumentException(
-                    "Absolute URI is required, but received " + uriRef);
+            throw new IllegalArgumentException("Absolute URI is required, but received " + uriRef);
         }
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory
-                .newInstance();
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setNamespaceAware(true);
         docFactory.setExpandEntityReferences(false);
         docFactory.setXIncludeAware(true);
@@ -59,8 +56,7 @@ public class URIUtils {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             doc = docBuilder.parse(uriRef.toString());
         } catch (ParserConfigurationException x) {
-            TestSuiteLogger.log(Level.WARNING,
-                    "Failed to create DocumentBuilder." + x);
+            TestSuiteLogger.log(Level.WARNING, "Failed to create DocumentBuilder." + x);
         }
         if (null != doc) {
             doc.setDocumentURI(uriRef.toString());
@@ -82,8 +78,7 @@ public class URIUtils {
      */
     public static File dereferenceURI(URI uriRef) throws IOException {
         if ((null == uriRef) || !uriRef.isAbsolute()) {
-            throw new IllegalArgumentException(
-                    "Absolute URI is required, but received " + uriRef);
+            throw new IllegalArgumentException("Absolute URI is required, but received " + uriRef);
         }
         if (uriRef.getScheme().equalsIgnoreCase("file")) {
             return new File(uriRef);
@@ -91,11 +86,13 @@ public class URIUtils {
         Client client = Client.create();
         WebResource webRes = client.resource(uriRef);
         ClientResponse rsp = webRes.get(ClientResponse.class);
-        String suffix = null;
+        int lastIndexOfDot = uriRef.getPath().lastIndexOf('.');
+        // preserve suffix if possible
+        String suffix = (lastIndexOfDot > 0) ? uriRef.getPath().substring(lastIndexOfDot) : ".db";
         if (rsp.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE).endsWith("xml")) {
             suffix = ".xml";
         }
-        File destFile = File.createTempFile("entity-", suffix);
+        File destFile = File.createTempFile("gpkg-", suffix);
         if (rsp.hasEntity()) {
             InputStream is = rsp.getEntityInputStream();
             OutputStream os = new FileOutputStream(destFile);
@@ -108,8 +105,8 @@ public class URIUtils {
             os.flush();
             os.close();
         }
-        TestSuiteLogger.log(Level.FINE, "Wrote " + destFile.length()
-                + " bytes to file at " + destFile.getAbsolutePath());
+        TestSuiteLogger.log(Level.CONFIG,
+                "Wrote " + destFile.length() + " bytes to file at " + destFile.getAbsolutePath());
         return destFile;
     }
 
@@ -129,8 +126,7 @@ public class URIUtils {
     public static URI resolveRelativeURI(String baseURI, String uriRef) {
         URI uri = (null != baseURI) ? URI.create(baseURI) : URI.create("");
         if (null != baseURI && null == uri.getScheme()) {
-            throw new IllegalArgumentException(
-                    "Base URI has no scheme component: " + baseURI);
+            throw new IllegalArgumentException("Base URI has no scheme component: " + baseURI);
         }
         return uri.resolve(uriRef);
     }
