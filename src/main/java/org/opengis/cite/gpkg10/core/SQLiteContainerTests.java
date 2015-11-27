@@ -4,12 +4,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+
+import javax.sql.DataSource;
 
 import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
 import org.opengis.cite.gpkg10.GPKG10;
 import org.opengis.cite.gpkg10.SuiteAttribute;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteConfig.JournalMode;
+import org.sqlite.SQLiteConfig.SynchronousMode;
+import org.sqlite.SQLiteDataSource;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -34,38 +41,96 @@ import org.testng.annotations.Test;
 public class SQLiteContainerTests {
 
     private File gpkgFile;
-    private Connection dbConnection;
+    private DataSource dataSource;
 
     @BeforeClass
-    public void initFixture(ITestContext testContext) {
+    public void initFixture(ITestContext testContext) throws SQLException {
         Object testFile = testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName());
         if (null == testFile || !File.class.isInstance(testFile)) {
             throw new IllegalArgumentException(
                     String.format("Suite attribute value is not a File: %s", SuiteAttribute.TEST_SUBJ_FILE.getName()));
         }
         this.gpkgFile = File.class.cast(testFile);
-        // TODO create SQLite db connection
+        SQLiteConfig dbConfig = new SQLiteConfig();
+        dbConfig.setSynchronous(SynchronousMode.OFF);
+        dbConfig.setJournalMode(JournalMode.MEMORY);
+        dbConfig.enforceForeignKeys(true);
+        SQLiteDataSource sqliteSource = new SQLiteDataSource(dbConfig);
+        sqliteSource.setUrl("jdbc:sqlite:" + this.gpkgFile.getPath());
+        this.dataSource = sqliteSource;
     }
 
     /**
      * A GeoPackage shall be a SQLite database file using version 3 of the
      * SQLite file format. The first 16 bytes of a GeoPackage must contain the
-     * (ASCII) string “SQLite format 3”, including the terminating NULL
+     * (UTF-8/ASCII) string "SQLite format 3", including the terminating NULL
      * character.
      * 
      * @throws IOException
      *             If an I/O error occurs while trying to read the data file.
      * 
      * @see <a href="http://www.geopackage.org/spec/#_requirement-1" target=
-     *      "_blank">File Format: Requirement 1</a>
+     *      "_blank">File Format - Requirement 1</a>
      */
     @Test(description = "See OGC 12-128r12: Requirement 1")
-    public void validHeaderString() throws IOException {
+    public void fileHeaderString() throws IOException {
         final byte[] headerString = new byte[GPKG10.SQLITE_MAGIC_HEADER.length];
         try (FileInputStream fileInputStream = new FileInputStream(this.gpkgFile)) {
             fileInputStream.read(headerString);
         }
         Assert.assertEquals(headerString, GPKG10.SQLITE_MAGIC_HEADER, ErrorMessage
                 .format(ErrorMessageKeys.INVALID_HEADER_STR, new String(headerString, StandardCharsets.US_ASCII)));
+    }
+
+    /**
+     * A GeoPackage shall contain 0x47503130 ("GP10" in UTF-8/ASCII) in the
+     * "Application ID" field of the database header. The field is located at
+     * offset 64 (a 32-bit unsigned big-endian integer).
+     * 
+     * @throws IOException
+     *             If an I/O error occurs while trying to read the data file.
+     * 
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-2" target=
+     *      "_blank">File Format - Requirement 2</a>
+     * @see <a href=
+     *      "http://www.sqlite.org/src/artifact?ci=trunk&filename=magic.txt"
+     *      target= "_blank">Assigned application IDs</a>
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 2")
+    public void applicationID() throws IOException {
+        final byte[] headerBytes = new byte[GPKG10.DB_HEADER_LENGTH];
+        try (FileInputStream fileInputStream = new FileInputStream(this.gpkgFile)) {
+            fileInputStream.read(headerBytes);
+        }
+        byte[] appID = Arrays.copyOfRange(headerBytes, GPKG10.APP_ID_OFFSET, GPKG10.APP_ID_OFFSET + 4);
+        Assert.assertEquals(appID, GPKG10.APP_GP10,
+                ErrorMessage.format(ErrorMessageKeys.UNKNOWN_APP_ID, new String(appID, StandardCharsets.US_ASCII)));
+    }
+
+    /**
+     * A GeoPackage shall have the file extension name ".gpkg".
+     * 
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-3" target=
+     *      "_blank">File Extension Name - Requirement 3</a>
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 3")
+    public void filenameExtension() {
+        String fileName = this.gpkgFile.getName();
+        String suffix = fileName.substring(fileName.indexOf('.'));
+        Assert.assertEquals(suffix, GPKG10.GPKG_FILENAME_SUFFIX,
+                ErrorMessage.format(ErrorMessageKeys.INVALID_SUFFIX, suffix));
+    }
+
+    /**
+     * A GeoPackage shall only contain data elements, SQL constructs and
+     * GeoPackage extensions with the “gpkg” author name specified in this
+     * encoding standard.
+     * 
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-4" target=
+     *      "_blank">File Contents - Requirement 4</a>
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 4")
+    public void fileContents() {
+        // TODO: Look for tables, columns, data types, etc. NOT allowed by spec
     }
 }

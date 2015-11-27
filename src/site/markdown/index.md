@@ -6,7 +6,7 @@
 This conformance test suite verifies the structure and content of a GeoPackage 1.0 
 data container. The [GeoPackage specification](http://www.geopackage.org/spec/) describes 
 how a platform-independent [SQLite database file](https://www.sqlite.org/fileformat2.html) 
-may contain various types of content:
+may contain various types of content, including:
 
 * vector geospatial features
 * tile matrix sets of imagery and raster maps at various scales
@@ -43,9 +43,7 @@ conforming implementation.
 If any of the following preconditions are not satisfied then all tests in the 
 suite will be marked as skipped.
 
-1. Precondition 1;
-2. Precondition 2.
-
+1. The major version number in the SQLITE_VERSION_NUMBER header field is 3.
 
 ## Test suite structure
 
