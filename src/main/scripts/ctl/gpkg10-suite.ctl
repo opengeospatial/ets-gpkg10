@@ -49,7 +49,7 @@
                  <label for="uri">
                    <h4 style="margin-bottom: 0.5em">Location of GeoPackage (absolute http: or file: URI)</h4>
                  </label>
-                 <input id="uri" name="uri" size="128" type="text" value="http://www.w3schools.com/xml/note.xml" />
+                 <input id="uri" name="uri" size="128" type="text" value="http://www.geopackage.org/data/simple_sewer_features.gpkg" />
                </p>
                <p>
                  <label for="doc">
