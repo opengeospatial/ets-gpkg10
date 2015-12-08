@@ -7,7 +7,6 @@ import org.opengis.cite.gpkg10.GPKG10;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
 import org.testng.annotations.Test;
 
-import javax.print.attribute.standard.Severity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
