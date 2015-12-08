@@ -99,9 +99,33 @@ public class DataContentsTests extends CommonFixture
 
             assertEquals(resultSet.getString("integrity_check").toLowerCase(),
                          GPKG10.PRAGMA_INTEGRITY_CHECK,
-                         ErrorMessageKeys.PRAGMA_INTEGRITY_CHECK_NOT_OK);
+                         ErrorMessage.format(ErrorMessageKeys.PRAGMA_INTEGRITY_CHECK_NOT_OK));
         }
     }
+
+    /**
+     * The SQLite PRAGMA foreign_key_check SQL with no parameter value SHALL
+     * return an empty result set indicating no invalid foreign key values for
+     * a GeoPackage file.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-7" target=
+     *      "_blank">File Integrity - Requirement 7</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 7")
+    public void foreignKeyCheck() throws SQLException
+    {
+        try(final Statement statement = this.databaseConnection.createStatement();
+            final ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check;"))
+        {
+            assertTrue(!resultSet.next(),
+                       ErrorMessage.format(ErrorMessageKeys.INVALID_FOREIGN_KEY));
+        }
+    }
+
+
 
     private static final Pattern TEXT_TYPE = Pattern.compile("TEXT\\([0-9]+\\)");
     private static final Pattern BLOB_TYPE = Pattern.compile("BLOB\\([0-9]+\\)");
