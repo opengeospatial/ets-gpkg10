@@ -7,6 +7,7 @@ import org.opengis.cite.gpkg10.GPKG10;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
 import org.testng.annotations.Test;
 
+import javax.print.attribute.standard.Severity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 /**
  * Defines test methods that apply to descriptive information about the contents
@@ -125,7 +127,32 @@ public class DataContentsTests extends CommonFixture
         }
     }
 
+    /**
+     * A GeoPackage SQLite Configuration SHALL provide SQL access to
+     * GeoPackage contents via software APIs.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-8" target=
+     *      "_blank">Structured Query Language (SQL) - Requirement 8</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 8")
+    public void sqlCheck() throws SQLException
+    {
+        try(final Statement stmt   = this.databaseConnection.createStatement();
+            final ResultSet result = stmt.executeQuery("SELECT * FROM sqlite_master;"))
+        {
+            // If the statement can execute it has implemented the SQLite SQL API interface
+            return;
+        }
+        catch(final SQLException ignored)
+        {
+            // fall through to failure
+        }
 
+        fail(ErrorMessage.format(ErrorMessageKeys.NO_SQL_ACCESS));
+    }
 
     private static final Pattern TEXT_TYPE = Pattern.compile("TEXT\\([0-9]+\\)");
     private static final Pattern BLOB_TYPE = Pattern.compile("BLOB\\([0-9]+\\)");
