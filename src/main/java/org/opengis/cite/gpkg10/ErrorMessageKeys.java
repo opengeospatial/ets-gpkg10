@@ -22,4 +22,5 @@ public class ErrorMessageKeys {
     public static final String INVALID_HEADER_STR = "InvalidHeaderString";
     public static final String UNKNOWN_APP_ID = "UnknownApplicationId";
     public static final String INVALID_SUFFIX = "InvalidSuffix";
+    public static final String INVALID_DATA_TYPE = "InvalidDataType";
 }

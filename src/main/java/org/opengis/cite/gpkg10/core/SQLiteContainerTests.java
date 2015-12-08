@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
  * Defines test methods that apply to an SQLite database file. The GeoPackage
  * standard defines a SQL database schema designed for use with the SQLite
  * software library.
- * 
+ *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
@@ -35,10 +35,10 @@ public class SQLiteContainerTests extends CommonFixture {
      * SQLite file format. The first 16 bytes of a GeoPackage must contain the
      * (UTF-8/ASCII) string "SQLite format 3", including the terminating NULL
      * character.
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs while trying to read the data file.
-     * 
+     *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-1" target=
      *      "_blank">File Format - Requirement 1</a>
      */
@@ -56,10 +56,10 @@ public class SQLiteContainerTests extends CommonFixture {
      * A GeoPackage shall contain 0x47503130 ("GP10" in UTF-8/ASCII) in the
      * "Application ID" field of the database header. The field is located at
      * offset 64 (a 32-bit unsigned big-endian integer).
-     * 
+     *
      * @throws IOException
      *             If an I/O error occurs while trying to read the data file.
-     * 
+     *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-2" target=
      *      "_blank">File Format - Requirement 2</a>
      * @see <a href=
@@ -79,7 +79,7 @@ public class SQLiteContainerTests extends CommonFixture {
 
     /**
      * A GeoPackage shall have the file extension name ".gpkg".
-     * 
+     *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-3" target=
      *      "_blank">File Extension Name - Requirement 3</a>
      */
@@ -95,12 +95,13 @@ public class SQLiteContainerTests extends CommonFixture {
      * A GeoPackage shall only contain data elements, SQL constructs and
      * GeoPackage extensions with the “gpkg” author name specified in this
      * encoding standard.
-     * 
+     *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-4" target=
      *      "_blank">File Contents - Requirement 4</a>
      */
     @Test(description = "See OGC 12-128r12: Requirement 4")
     public void fileContents() {
         // TODO: Look for tables, columns, data types, etc. NOT allowed by spec
+        // Ignore tables and columns called out in extensions?
     }
 }
