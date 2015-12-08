@@ -3,6 +3,7 @@ package org.opengis.cite.gpkg10.core;
 import org.opengis.cite.gpkg10.CommonFixture;
 import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
+import org.opengis.cite.gpkg10.GPKG10;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
 import org.testng.annotations.Test;
 
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -77,7 +79,29 @@ public class DataContentsTests extends CommonFixture
         }
     }
 
-    
+    /**
+     * The SQLite PRAGMA integrity_check SQL command SHALL return "ok" for a
+     * GeoPackage file.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-6" target=
+     *      "_blank">File Integrity - Requirement 6</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 6")
+    public void pragmaIntegrityCheck() throws SQLException
+    {
+        try(final Statement statement = this.databaseConnection.createStatement();
+            final ResultSet resultSet = statement.executeQuery("PRAGMA integrity_check;"))
+        {
+            resultSet.next();
+
+            assertEquals(resultSet.getString("integrity_check").toLowerCase(),
+                         GPKG10.PRAGMA_INTEGRITY_CHECK,
+                         ErrorMessageKeys.PRAGMA_INTEGRITY_CHECK_NOT_OK);
+        }
+    }
 
     private static final Pattern TEXT_TYPE = Pattern.compile("TEXT\\([0-9]+\\)");
     private static final Pattern BLOB_TYPE = Pattern.compile("BLOB\\([0-9]+\\)");
