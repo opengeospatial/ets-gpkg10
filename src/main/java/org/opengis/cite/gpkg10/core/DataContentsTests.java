@@ -1,6 +1,5 @@
 package org.opengis.cite.gpkg10.core;
 
-import net.sf.saxon.Err;
 import org.opengis.cite.gpkg10.ColumnDefinition;
 import org.opengis.cite.gpkg10.CommonFixture;
 import org.opengis.cite.gpkg10.ErrorMessage;
@@ -23,9 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
@@ -216,9 +213,14 @@ public class DataContentsTests extends CommonFixture
      *             If an SQL query causes an error
      */
     @Test(description = "See OGC 12-128r12: Requirement 16")
-    public void contentsTablesExist() throws SQLException
+    public void srsIdReferencesSrsTable() throws SQLException
     {
-
+        try(final Statement statement  = this.databaseConnection.createStatement();
+            final ResultSet resultSet = statement.executeQuery("PRAGMA foreign_key_check('gpkg_contents');"))
+        {
+            assertTrue(!resultSet.next(),
+                       ErrorMessage.format(ErrorMessageKeys.BAD_CONTENTS_TABLE_SRS_FOREIGN_KEY));
+        }
     }
 
 

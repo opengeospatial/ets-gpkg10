@@ -143,7 +143,7 @@ public class SpatialReferenceSystemsTests  extends CommonFixture
         final String query = "SELECT DISTINCT srs_id as srsContents "+
                              "FROM gpkg_contents "+
                              "WHERE srsContents " +
-                             "NOT IN (SELECT srs_id FROM %s);";
+                             "NOT IN (SELECT srs_id FROM gpkg_spatial_ref_sys);";
 
         try(final Statement statement  = this.databaseConnection.createStatement();
             final ResultSet srsDefined = statement.executeQuery(query))
