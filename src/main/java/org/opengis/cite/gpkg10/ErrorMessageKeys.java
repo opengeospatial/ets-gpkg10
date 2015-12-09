@@ -27,4 +27,11 @@ public class ErrorMessageKeys {
     public static final String INVALID_FOREIGN_KEY = "InvalidForeignKey";
     public static final String NO_SQL_ACCESS = "NoSqlAccess";
     public static final String SQLITE_OMIT_OPTIONS = "SqliteOmitOptions";
+    public static final String BAD_SRS_TABLE_DEFINITION = "BadSrsTableDefinition";
+    public static final String NO_GEOGRAPHIC_SRS = "NoGeographicSrs";
+    public static final String NO_UNDEFINED_CARTESIAN_SRS = "NoUndefinedCartesianSrs";
+    public static final String NO_UNDEFINED_GEOGRAPHIC_SRS = "NoUndefinedGeographicSrs";
+    public static final String UNDEFINED_SRS = "UndefinedSrs";
+    public static final String CONTENT_TABLE_DOES_NOT_EXIST = "ContentTableDoesNotExist";
+    public static final String BAD_CONTENTS_ENTRY_LAST_CHANGE_FORMAT = "BadContentsEntryLastChangeFormat";
 }
