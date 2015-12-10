@@ -79,8 +79,8 @@ public class ColumnDefinition
         return this.sqlType.equals(other.sqlType)    &&
                this.notNull      == other.notNull    &&
                this.primaryKey   == other.primaryKey &&
-               this.unique       == other.unique     &&
-               (this.defaultValue == null ? other.defaultValue == null : this.defaultValue.matches(other.defaultValue));
+               this.unique       == other.unique     /*&&
+               (this.defaultValue == null ? other.defaultValue == null : this.defaultValue.equals(other.defaultValue))*/; // Skip the test for equality in favor of a functional equivalence test with a query
     }
 
     @Override
@@ -102,6 +102,11 @@ public class ColumnDefinition
                              this.defaultValue,
                              this.primaryKey,
                              this.unique);
+    }
+
+    public String getDefaultValue()
+    {
+        return this.defaultValue;
     }
 
     private final String  sqlType;

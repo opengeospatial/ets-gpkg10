@@ -122,14 +122,39 @@ public final class TableVerifier
 
                 if(columnDefinition != null)
                 {
-                    if(columnDefinition.equals(column.getValue()))
+                    if(!columnDefinition.equals(column.getValue()) ||
+                       !checkExpressionEquivalence(connection,
+                                                   columnDefinition.getDefaultValue(),
+                                                   column.getValue().getDefaultValue()))    // .equals() for ColumnDefinition skips comparing default values. It's better to check for functional equivalence rather than exact string equality. This avoids issues with difference in white space as well as other trivial annoyances
                     {
                         throw new RuntimeException(String.format("Required column %s is defined as:\n%s\nbut should be:\n%s",
-                                                   column.getKey(),
-                                                   columnDefinition.toString(),
-                                                   column.getValue().toString()));
+                                                                 column.getKey(),
+                                                                 columnDefinition.toString(),
+                                                                 column.getValue().toString()));
                     }
                 }
+            }
+        }
+    }
+
+    private static boolean checkExpressionEquivalence(final Connection connection,
+                                                      final String     expression1,
+                                                      final String     expression2) throws SQLException
+    {
+        if((expression1 == null) || (expression2 == null))
+        {
+            return (expression1 == null) && (expression2 == null);
+        }
+
+        try(final Statement statement = connection.createStatement())
+        {
+            final String query = String.format("SELECT (%s) = (%s);",
+                                               expression1,
+                                               expression2);
+
+            try(final ResultSet results = statement.executeQuery(query))
+            {
+                return results.next() && results.getBoolean(1);
             }
         }
     }
