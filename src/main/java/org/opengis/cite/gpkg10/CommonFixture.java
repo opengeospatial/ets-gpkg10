@@ -38,10 +38,11 @@ public class CommonFixture {
      * @param testContext
      *            The test context that contains all the information for a test
      *            run, including suite attributes.
+     * @throws SQLException
+     *             If a database access error occurs.
      */
     @BeforeClass
-    public void initCommonFixture(final ITestContext testContext) throws SQLException
-    {
+    public void initCommonFixture(final ITestContext testContext) throws SQLException {
         final Object testFile = testContext.getSuite().getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName());
         if (testFile == null || !File.class.isInstance(testFile)) {
             throw new IllegalArgumentException(
@@ -59,10 +60,8 @@ public class CommonFixture {
     }
 
     @AfterClass
-    public void close() throws SQLException
-    {
-        if(this.databaseConnection != null && !this.databaseConnection.isClosed())
-        {
+    public void close() throws SQLException {
+        if (this.databaseConnection != null && !this.databaseConnection.isClosed()) {
             this.databaseConnection.close();
         }
     }

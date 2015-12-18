@@ -127,7 +127,7 @@ public class DataContentsTests extends CommonFixture
         }
         catch(final Throwable th)
         {
-            fail(ErrorMessage.format(ErrorMessageKeys.BAD_SRS_TABLE_DEFINITION, th.getMessage()));
+            fail(ErrorMessage.format(ErrorMessageKeys.BAD_CONTENTS_TABLE_DEFINITION, th.getMessage()));
         }
     }
 
