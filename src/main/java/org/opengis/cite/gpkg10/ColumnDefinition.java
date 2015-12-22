@@ -76,9 +76,29 @@ public class ColumnDefinition
 
         final ColumnDefinition other = (ColumnDefinition)object;
 
-        return this.sqlType.equals(other.sqlType)    &&
-               this.notNull      == other.notNull    &&
-               this.primaryKey   == other.primaryKey &&
+        // This was added on behalf of Richard Martell, based on the following
+        // justification:
+        //
+        // "According to the SQL standard, PRIMARY KEY should always imply NOT
+        // NULL. Unfortunately, due to a bug in some early versions, this is
+        // not the case in SQLite. Unless the column is an INTEGER PRIMARY KEY
+        // or the table is a WITHOUT ROWID table or the column is declared NOT
+        // NULL, SQLite allows NULL values in a PRIMARY KEY column. SQLite
+        // could be fixed to conform to the standard, but doing so might break
+        // legacy applications. Hence, it has been decided to merely document
+        // the fact that SQLite allowing NULLs in most PRIMARY KEY columns."
+        //
+        // ref: https://www.sqlite.org/lang_createtable.html#constraints
+        //
+        // This addition allows the column definition checks to be more
+        // permissive (i.e. allow implicit NOT NULL) for PK columns of type
+        // INTEGER.
+        final boolean implicitNotNull = this.primaryKey &&
+                                        this.sqlType.toUpperCase().equals("INTEGER");
+
+        return this.sqlType.equals(other.sqlType)                      &&
+               ((this.notNull    == other.notNull) || implicitNotNull) &&
+               this.primaryKey   == other.primaryKey                   &&
                this.unique       == other.unique     /*&&
                (this.defaultValue == null ? other.defaultValue == null : this.defaultValue.equals(other.defaultValue))*/; // Skip the test for equality in favor of a functional equivalence test with a query
     }
