@@ -22,4 +22,18 @@ public class ErrorMessageKeys {
     public static final String INVALID_HEADER_STR = "InvalidHeaderString";
     public static final String UNKNOWN_APP_ID = "UnknownApplicationId";
     public static final String INVALID_SUFFIX = "InvalidSuffix";
+    public static final String INVALID_DATA_TYPE = "InvalidDataType";
+    public static final String PRAGMA_INTEGRITY_CHECK_NOT_OK = "PragmaIntegrityCheckNotOk";
+    public static final String INVALID_FOREIGN_KEY = "InvalidForeignKey";
+    public static final String NO_SQL_ACCESS = "NoSqlAccess";
+    public static final String SQLITE_OMIT_OPTIONS = "SqliteOmitOptions";
+    public static final String BAD_SRS_TABLE_DEFINITION = "BadSrsTableDefinition";
+    public static final String NO_GEOGRAPHIC_SRS = "NoGeographicSrs";
+    public static final String NO_UNDEFINED_CARTESIAN_SRS = "NoUndefinedCartesianSrs";
+    public static final String NO_UNDEFINED_GEOGRAPHIC_SRS = "NoUndefinedGeographicSrs";
+    public static final String UNDEFINED_SRS = "UndefinedSrs";
+    public static final String CONTENT_TABLE_DOES_NOT_EXIST = "ContentTableDoesNotExist";
+    public static final String BAD_CONTENTS_ENTRY_LAST_CHANGE_FORMAT = "BadContentsEntryLastChangeFormat";
+    public static final String BAD_CONTENTS_TABLE_SRS_FOREIGN_KEY = "BadContentsTableSrsForeignKey";
+    public static final String BAD_CONTENTS_TABLE_DEFINITION = "BadContentsTableDefinition";
 }
