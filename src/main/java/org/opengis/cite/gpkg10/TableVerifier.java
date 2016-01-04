@@ -25,23 +25,27 @@ public final class TableVerifier
 
     }
 
-    public static void verifyTable(final Connection connection, final TableDefinition table) throws SQLException
+    public static void verifyTable(final Connection                    connection,
+                                   final String                        tableName,
+                                   final Map<String, ColumnDefinition> expectedColumns,
+                                   final Set<ForeignKeyDefinition>     expectedForeinKeys,
+                                   final Iterable<UniqueDefinition>    expectedGroupUniques) throws SQLException
     {
-        verifyTableDefinition(connection, table.getName());
+        verifyTableDefinition(connection, tableName);
 
-        final Set<UniqueDefinition> uniques = getUniques(connection, table.getName());
+        final Set<UniqueDefinition> uniques = getUniques(connection, tableName);
 
         verifyColumns(connection,
-                      table.getName(),
-                      table.getColumns(),
+                      tableName,
+                      expectedColumns,
                       uniques);
 
         verifyForeignKeys(connection,
-                          table.getName(),
-                          table.getForeignKeys());
+                          tableName,
+                          expectedForeinKeys);
 
-        verifyGroupUniques(table.getName(),
-                           table.getGroupUniques(),
+        verifyGroupUniques(tableName,
+                           expectedGroupUniques,
                            uniques);
     }
 

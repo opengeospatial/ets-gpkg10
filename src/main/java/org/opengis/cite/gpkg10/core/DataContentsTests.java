@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -121,13 +122,14 @@ public class DataContentsTests extends CommonFixture
             contentColumns.put("srs_id",      new ColumnDefinition("INTEGER",  false, false, false, null));
 
             TableVerifier.verifyTable(this.databaseConnection,
-                                      new TableDefinition("gpkg_contents",
-                                                          contentColumns,
-                                                          new HashSet<>(Arrays.asList(new ForeignKeyDefinition("gpkg_spatial_ref_sys", "srs_id", "srs_id")))));
+                                      "gpkg_contents",
+                                      contentColumns,
+                                      new HashSet<>(Arrays.asList(new ForeignKeyDefinition("gpkg_spatial_ref_sys", "srs_id", "srs_id"))),
+                                      Collections.emptyList());
         }
-        catch(final Throwable th)
+        catch(final AssertionError ex)
         {
-            fail(ErrorMessage.format(ErrorMessageKeys.BAD_CONTENTS_TABLE_DEFINITION, th.getMessage()));
+            fail(ErrorMessage.format(ErrorMessageKeys.BAD_CONTENTS_TABLE_DEFINITION, ex.getMessage()));
         }
     }
 
