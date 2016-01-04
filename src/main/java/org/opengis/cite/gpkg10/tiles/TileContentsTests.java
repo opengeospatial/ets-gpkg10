@@ -312,6 +312,40 @@ public class TileContentsTests extends CommonFixture
         }
     }
 
+    /**
+     * The gpkg_tile_matrix_set table or view SHALL contain one row record for
+     * each tile pyramid user data table.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-40" target=
+     *      "_blank">Table Data Values - Requirement 40</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 40")
+    public void matrixSetNameForEachTilesTable() throws SQLException
+    {
+        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set"))
+        {
+            try(Statement statement = this.databaseConnection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix_set;"))
+            {
+                final Collection<String> tableNames = new LinkedList<>();
+
+                while(resultSet.next())
+                {
+                    tableNames.add(resultSet.getString("table_name"));
+                }
+
+                for(final String tableName : this.contentsTileTableNames)
+                {
+                    assertTrue(tableNames.contains(tableName),
+                               ErrorMessage.format(ErrorMessageKeys.UNREFERENCED_TILES_CONTENT_TABLE_NAME, tableName));
+                }
+            }
+        }
+    }
+
     private static boolean isEqual(final double first, final double second)
     {
         return Math.abs(first - second) < EPSILON;

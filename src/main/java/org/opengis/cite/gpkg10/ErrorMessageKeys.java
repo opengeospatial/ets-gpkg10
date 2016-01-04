@@ -42,4 +42,5 @@ public class ErrorMessageKeys {
     public static final String TILE_MATRIX_SET_TABLE_DOES_NOT_EXIST = "TileMatrixSetTableDoesNotExist";
     public static final String BAD_TILE_MATRIX_SET_TABLE_DEFINITION = "BadTileMatrixSetTableDefinition";
     public static final String UNREFERENCED_TILE_MATRIX_SET_TABLE = "UnreferencedTileMatrixSetTable";
+    public static final String UNREFERENCED_TILES_CONTENT_TABLE_NAME = "UnreferencedTilesContentTableName";
 }
