@@ -43,4 +43,9 @@ public class ErrorMessageKeys {
     public static final String BAD_TILE_MATRIX_SET_TABLE_DEFINITION = "BadTileMatrixSetTableDefinition";
     public static final String UNREFERENCED_TILE_MATRIX_SET_TABLE = "UnreferencedTileMatrixSetTable";
     public static final String UNREFERENCED_TILES_CONTENT_TABLE_NAME = "UnreferencedTilesContentTableName";
+    public static final String BAD_MATRIX_SET_SRS_REFERENCE = "BadMatrixSetSrsReference";
+    public static final String TILE_MATRIX_TABLE_DOES_NOT_EXIST = "TileMatrixTableDoesNotExist";
+    public static final String BAD_TILE_MATRIX_TABLE_DEFINITION = "BadTileMatrixTableDefinition";
+    public static final String BAD_MATRIX_CONTENTS_REFERENCE = "BadMatrixContentsReference";
+    public static final String MISSING_TILE_MATRIX_ENTRY = "MissingTileMatrixEntry";
 }

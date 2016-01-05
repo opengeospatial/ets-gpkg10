@@ -8,12 +8,14 @@ import org.opengis.cite.gpkg10.ForeignKeyDefinition;
 import org.opengis.cite.gpkg10.TableVerifier;
 import org.opengis.cite.gpkg10.UniqueDefinition;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
+import javax.print.attribute.standard.Severity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -54,7 +56,8 @@ import static org.testng.AssertJUnit.fail;
  */
 public class TileContentsTests extends CommonFixture
 {
-    public TileContentsTests() throws SQLException
+    @BeforeClass
+    public void setUp() throws SQLException
     {
         try(Statement statement = this.databaseConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT tbl_name FROM sqlite_master WHERE tbl_name NOT LIKE 'gpkg_%' AND (type = 'table' OR type = 'view');"))
@@ -275,9 +278,9 @@ public class TileContentsTests extends CommonFixture
                                                                       new ForeignKeyDefinition("gpkg_contents",        "table_name", "table_name"))),
                                           Collections.emptyList());
             }
-            catch(final AssertionError th)
+            catch(final AssertionError ex)
             {
-                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_SET_TABLE_DEFINITION, th.getMessage()));
+                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_SET_TABLE_DEFINITION, ex.getMessage()));
             }
         }
     }
@@ -313,8 +316,8 @@ public class TileContentsTests extends CommonFixture
     }
 
     /**
-     * The gpkg_tile_matrix_set table or view SHALL contain one row record for
-     * each tile pyramid user data table.
+     * The {@code gpkg_tile_matrix_set} table or view SHALL contain one row
+     * record for each tile pyramid user data table.
      *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-40" target=
      *      "_blank">Table Data Values - Requirement 40</a>
@@ -341,6 +344,163 @@ public class TileContentsTests extends CommonFixture
                 {
                     assertTrue(tableNames.contains(tableName),
                                ErrorMessage.format(ErrorMessageKeys.UNREFERENCED_TILES_CONTENT_TABLE_NAME, tableName));
+                }
+            }
+        }
+    }
+
+    /**
+     * Values of the {@code gpkg_tile_matrix_set} {@code srs_id} column SHALL
+     * reference values in the {@code gpkg_spatial_ref_sys} {@code srs_id}
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-41" target=
+     *      "_blank">Table Data Values - Requirement 41</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 41")
+    public void matrixSetSrsIdReferencesGoodId() throws SQLException
+    {
+        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set"))
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT srs_id from gpkg_tile_matrix_set WHERE srs_id NOT IN (SELECT srs_id FROM gpkg_spatial_ref_sys);"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessage.format(ErrorMessageKeys.BAD_MATRIX_SET_SRS_REFERENCE, resultSet.getInt("srs_id")));
+                }
+            }
+        }
+    }
+
+    /**
+     * A GeoPackage that contains a tile pyramid user data table SHALL contain
+     * a {@code gpkg_tile_matrix} table or view per clause 2.2.7.1.1 <a href=
+     * "http://www.geopackage.org/spec/#tile_matrix_data_table_definition">
+     * Table Definition</a>, Table <a href=
+     * "http://www.geopackage.org/spec/#gpkg_tile_matrix_cols">Tile Matrix
+     * Metadata Table or View Definition</a> and Table <a href=
+     * "http://www.geopackage.org/spec/#gpkg_tile_matrix_sql">
+     * gpkg_tile_matrix Table Creation SQL</a>.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-42" target=
+     *      "_blank">Tile Matrix - Table Definition - Requirement 42</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 42")
+    public void tileMatrixTableDefinition() throws SQLException
+    {
+        if(!this.tileTableNames.isEmpty())
+        {
+            assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"),
+                       ErrorMessageKeys.TILE_MATRIX_TABLE_DOES_NOT_EXIST);
+
+            try
+            {
+                final Map<String, ColumnDefinition> tileMatrixColumns = new HashMap<>();
+
+                tileMatrixColumns.put("table_name",     new ColumnDefinition("TEXT",    true, true,  true,  null));
+                tileMatrixColumns.put("zoom_level",     new ColumnDefinition("INTEGER", true, true,  true,  null));
+                tileMatrixColumns.put("matrix_width",   new ColumnDefinition("INTEGER", true, false, false, null));
+                tileMatrixColumns.put("matrix_height",  new ColumnDefinition("INTEGER", true, false, false, null));
+                tileMatrixColumns.put("tile_width",     new ColumnDefinition("INTEGER", true, false, false, null));
+                tileMatrixColumns.put("tile_height",    new ColumnDefinition("INTEGER", true, false, false, null));
+                tileMatrixColumns.put("pixel_x_size",   new ColumnDefinition("DOUBLE",  true, false, false, null));
+                tileMatrixColumns.put("pixel_y_size",   new ColumnDefinition("DOUBLE",  true, false, false, null));
+
+                TableVerifier.verifyTable(this.databaseConnection,
+                                          "gpkg_tile_matrix",
+                                          tileMatrixColumns,
+                                          new HashSet<>(Arrays.asList(new ForeignKeyDefinition("gpkg_contents", "table_name", "table_name"))),
+                                          Collections.emptyList());
+            }
+            catch(final AssertionError ex)
+            {
+                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_TABLE_DEFINITION, ex.getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Values of the {@code gpkg_tile_matrix} {@code table_name}
+     * column SHALL reference values in the {@code gpkg_contents} {@code
+     * table_name} column for rows with a {@code data_type} of
+     * 'tiles'.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-43" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 43</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 43")
+    public void tileMatrixTableContentsReferences() throws SQLException
+    {
+        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"))
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix AS tm WHERE table_name NOT IN (SELECT table_name FROM gpkg_contents AS gc WHERE tm.table_name = gc.table_name AND gc.data_type = 'tiles');"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessage.format(ErrorMessageKeys.BAD_MATRIX_CONTENTS_REFERENCE, resultSet.getString("table_name")));
+                }
+            }
+        }
+    }
+
+    /**
+     * The {@code gpkg_tile_matrix} table or view SHALL contain one row
+     * record for each zoom level that contains one or more tiles in each tile
+     * pyramid user data table or view.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-44" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 44</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 43")
+    public void tileMatrixPerZoomLevel() throws SQLException
+    {
+        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"))
+        {
+            for(final String tableName : this.tileTableNames)
+            {
+                final Collection<Integer> tileMatrixZooms = new LinkedList<>();
+
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT DISTINCT zoom_level FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level;"))
+                {
+                    statement.setString(1, tableName);
+
+                    try(final ResultSet gmZoomLevels = statement.executeQuery())
+                    {
+                        while(gmZoomLevels.next())
+                        {
+                            tileMatrixZooms.add(gmZoomLevels.getInt("zoom_level"));
+                        }
+                    }
+                }
+
+                final Collection<Integer> tilePyramidZooms = new LinkedList<>();
+
+                try(final Statement statement    = this.databaseConnection.createStatement();
+                    final ResultSet pyZoomLevels = statement.executeQuery(String.format("SELECT DISTINCT zoom_level FROM %s ORDER BY zoom_level;", tableName)))
+                {
+                    while(pyZoomLevels.next())
+                    {
+                        tilePyramidZooms.add(pyZoomLevels.getInt("zoom_level"));
+                    }
+                }
+
+                for(final Integer zoom: tilePyramidZooms)
+                {
+                    assertTrue(tileMatrixZooms.contains(zoom),
+                               ErrorMessage.format(ErrorMessageKeys.MISSING_TILE_MATRIX_ENTRY, zoom, tableName));
                 }
             }
         }
@@ -400,8 +560,6 @@ public class TileContentsTests extends CommonFixture
 
     static
     {
-        TileTableExpectedColumns = new HashMap<>();
-
         jpegImageReaders = StreamSupport.stream(Spliterators.spliteratorUnknownSize(ImageIO.getImageReadersByMIMEType("image/jpeg"),
                                                                                     Spliterator.ORDERED),
                                                 false)
@@ -411,6 +569,8 @@ public class TileContentsTests extends CommonFixture
                                                                                     Spliterator.ORDERED),
                                                 false)
                                         .collect(Collectors.toCollection(ArrayList::new));
+
+        TileTableExpectedColumns = new HashMap<>();
 
         TileTableExpectedColumns.put("id",           new ColumnDefinition("INTEGER", false, true,  true,  null));
         TileTableExpectedColumns.put("zoom_level",   new ColumnDefinition("INTEGER", true,  false, false, null));
