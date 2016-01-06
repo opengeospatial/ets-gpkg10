@@ -48,4 +48,13 @@ public class ErrorMessageKeys {
     public static final String BAD_TILE_MATRIX_TABLE_DEFINITION = "BadTileMatrixTableDefinition";
     public static final String BAD_MATRIX_CONTENTS_REFERENCE = "BadMatrixContentsReference";
     public static final String MISSING_TILE_MATRIX_ENTRY = "MissingTileMatrixEntry";
+    public static final String BAD_PIXEL_DIMENSIONS = "BadPixelDimensions";
+    public static final String NEGATIVE_ZOOM_LEVEL = "NegativeZoomLevel";
+    public static final String NON_POSITIVE_MATRIX_WIDTH = "NonPositiveMatrixWidth";
+    public static final String NON_POSITIVE_MATRIX_HEIGHT = "NonPositiveMatrixHeight";
+    public static final String NON_POSITIVE_TILE_WIDTH = "NonPositiveTileWidth";
+    public static final String NON_POSITIVE_TILE_HEIGHT = "NonPositiveTileHeight";
+    public static final String NON_POSITIVE_PIXEL_X_SIZE = "NonPositivePixelXSize";
+    public static final String NON_POSITIVE_PIXEL_Y_SIZE = "NonPositivePixelYSize";
+    public static final String PIXEL_SIZE_NOT_DECREASING = "PixelSizeNotDecreasing";
 }

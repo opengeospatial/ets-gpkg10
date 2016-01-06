@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -59,6 +58,9 @@ public class TileContentsTests extends CommonFixture
     @BeforeClass
     public void setUp() throws SQLException
     {
+        this.hasTileMatrixTable    = DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix");
+        this.hasTileMatrixSetTable = DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set");
+
         try(Statement statement = this.databaseConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT tbl_name FROM sqlite_master WHERE tbl_name NOT LIKE 'gpkg_%' AND (type = 'table' OR type = 'view');"))
         {
@@ -256,9 +258,7 @@ public class TileContentsTests extends CommonFixture
     {
         if(!this.tileTableNames.isEmpty())
         {
-            assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection,
-                                                            "gpkg_tile_matrix_set"),
-                       ErrorMessageKeys.TILE_MATRIX_SET_TABLE_DOES_NOT_EXIST);
+            assertTrue(this.hasTileMatrixSetTable, ErrorMessageKeys.TILE_MATRIX_SET_TABLE_DOES_NOT_EXIST);
 
             try
             {
@@ -299,7 +299,7 @@ public class TileContentsTests extends CommonFixture
     @Test(description = "See OGC 12-128r12: Requirement 39")
     public void matrixSetNamesReferenceTiles() throws SQLException
     {
-        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set"))
+        if(this.hasTileMatrixSetTable)
         {
             try(Statement statement = this.databaseConnection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix_set;"))
@@ -328,7 +328,7 @@ public class TileContentsTests extends CommonFixture
     @Test(description = "See OGC 12-128r12: Requirement 40")
     public void matrixSetNameForEachTilesTable() throws SQLException
     {
-        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set"))
+        if(this.hasTileMatrixSetTable)
         {
             try(Statement statement = this.databaseConnection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix_set;"))
@@ -362,7 +362,7 @@ public class TileContentsTests extends CommonFixture
     @Test(description = "See OGC 12-128r12: Requirement 41")
     public void matrixSetSrsIdReferencesGoodId() throws SQLException
     {
-        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix_set"))
+        if(this.hasTileMatrixSetTable)
         {
             try(final Statement statement = this.databaseConnection.createStatement();
                 final ResultSet resultSet = statement.executeQuery("SELECT srs_id from gpkg_tile_matrix_set WHERE srs_id NOT IN (SELECT srs_id FROM gpkg_spatial_ref_sys);"))
@@ -396,8 +396,7 @@ public class TileContentsTests extends CommonFixture
     {
         if(!this.tileTableNames.isEmpty())
         {
-            assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"),
-                       ErrorMessageKeys.TILE_MATRIX_TABLE_DOES_NOT_EXIST);
+            assertTrue(this.hasTileMatrixTable, ErrorMessageKeys.TILE_MATRIX_TABLE_DOES_NOT_EXIST);
 
             try
             {
@@ -440,7 +439,7 @@ public class TileContentsTests extends CommonFixture
     @Test(description = "See OGC 12-128r12: Requirement 43")
     public void tileMatrixTableContentsReferences() throws SQLException
     {
-        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"))
+        if(this.hasTileMatrixTable)
         {
             try(final Statement statement = this.databaseConnection.createStatement();
                 final ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix AS tm WHERE table_name NOT IN (SELECT table_name FROM gpkg_contents AS gc WHERE tm.table_name = gc.table_name AND gc.data_type = 'tiles');"))
@@ -464,10 +463,10 @@ public class TileContentsTests extends CommonFixture
      * @throws SQLException
      *             If an SQL query causes an error
      */
-    @Test(description = "See OGC 12-128r12: Requirement 43")
+    @Test(description = "See OGC 12-128r12: Requirement 44")
     public void tileMatrixPerZoomLevel() throws SQLException
     {
-        if(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_matrix"))
+        if(this.hasTileMatrixTable)
         {
             for(final String tableName : this.tileTableNames)
             {
@@ -501,6 +500,302 @@ public class TileContentsTests extends CommonFixture
                 {
                     assertTrue(tileMatrixZooms.contains(zoom),
                                ErrorMessage.format(ErrorMessageKeys.MISSING_TILE_MATRIX_ENTRY, zoom, tableName));
+                }
+            }
+        }
+    }
+
+    /**
+     * The width of a tile matrix (the difference between {@code min_x} and
+     * {@code max_x} in {@code gpkg_tile_matrix_set}) SHALL equal the product
+     * of {@code matrix_width}, {@code tile_width}, and {@code pixel_x_size}
+     * for that zoom level. Similarly, height of a tile matrix (the difference
+     * between {@code min_y} and {@code max_y} in {@code gpkg_tile_matrix_set})
+     * SHALL equal the product of {@code matrix_height}, {@code tile_height},
+     * and {@code pixel_y_size} for that zoom level.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-45" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 45</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 45")
+    public void tileMatrixDimensionAgreement() throws SQLException
+    {
+        if(this.hasTileMatrixTable &&
+           DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_set_matrix"))
+        {
+            for(final String tableName : this.tileTableNames)
+            {
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT table_name, zoom_level, pixel_x_size, pixel_y_size, matrix_width, matrix_height, tile_width, tile_height FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
+                {
+                    statement.setString(1, tableName);
+
+                    try(final ResultSet pixelInfo = statement.executeQuery())
+                    {
+                        while(pixelInfo.next())
+                        {
+                            final double pixelXSize   = pixelInfo.getDouble("pixel_x_size");
+                            final double pixelYSize   = pixelInfo.getDouble("pixel_y_size");
+                            final int    zoomLevel    = pixelInfo.getInt   ("zoom_level");
+                            final double matrixHeight = pixelInfo.getInt   ("matrix_height");
+                            final double matrixWidth  = pixelInfo.getInt   ("matrix_width");
+                            final double tileHeight   = pixelInfo.getInt   ("tile_height");
+                            final double tileWidth    = pixelInfo.getInt   ("tile_width");
+
+                            try(final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT min_x, min_y, max_x, max_y FROM gpkg_tile_set_matrix WHERE table_name = ?"))
+                            {
+                                preparedStatement.setString(1, tableName);
+
+                                try(final ResultSet boundingBox = preparedStatement.executeQuery())
+                                {
+                                    if(boundingBox.next())
+                                    {
+                                        final double width  = boundingBox.getDouble("max_x") - boundingBox.getDouble("min_x");
+                                        final double height = boundingBox.getDouble("max_y") - boundingBox.getDouble("min_y");
+
+                                        assertTrue(isEqual(pixelXSize, (width  / matrixWidth)  / tileWidth) &&
+                                                   isEqual(pixelYSize, (height / matrixHeight) / tileHeight),
+                                                   ErrorMessage.format(ErrorMessageKeys.BAD_PIXEL_DIMENSIONS,
+                                                                       tableName,
+                                                                       zoomLevel));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The {@code zoom_level} column value in a {@code gpkg_tile_matrix} table
+     * row SHALL not be negative.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-46" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 46</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 46")
+    public void zoomLevelNotNegative() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT zoom_level FROM gpkg_tile_matrix WHERE zoom_level < 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NEGATIVE_ZOOM_LEVEL);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code matrix_width} column value in a {@code gpkg_tile_matrix} table
+     * row SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-47" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 47</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 47")
+    public void matrixWidthGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT matrix_width FROM gpkg_tile_matrix WHERE matrix_width <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_MATRIX_WIDTH);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code matrix_height} column value in a {@code gpkg_tile_matrix} table
+     * row SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-48" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 48</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 48")
+    public void matrixHeightGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT matrix_height FROM gpkg_tile_matrix WHERE matrix_height <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_MATRIX_HEIGHT);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code tile_width} column value in a {@code gpkg_tile_matrix} table row
+     * SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-49" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 49</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 49")
+    public void tileWidthGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT tile_width FROM gpkg_tile_matrix WHERE tile_width <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_TILE_WIDTH);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code tile_height} column value in a {@code gpkg_tile_matrix} table row
+     * SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-50" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 50</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 50")
+    public void tileHeightGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT tile_height FROM gpkg_tile_matrix WHERE tile_height <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_TILE_HEIGHT);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code pixel_x_size} column value in a {@code gpkg_tile_matrix} table row
+     * SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-51" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 51</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 51")
+    public void pixelXSizeGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT pixel_x_size FROM gpkg_tile_matrix WHERE pixel_x_size <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_PIXEL_X_SIZE);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@code pixel_y_size} column value in a {@code gpkg_tile_matrix} table row
+     * SHALL be greater than 0.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-52" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 52</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 52")
+    public void pixelYSizeGreaterThanZero() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            try(final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT pixel_y_size FROM gpkg_tile_matrix WHERE pixel_y_size <= 0;"))
+            {
+                if(resultSet.next())
+                {
+                    fail(ErrorMessageKeys.NON_POSITIVE_PIXEL_Y_SIZE);
+                }
+            }
+        }
+    }
+
+    /**
+     * The {@code pixel_x_size} and {@code pixel_y_size} column values for
+     * {@code zoom_level} column values in a {@code gpkg_tile_matrix} table
+     * sorted in ascending order SHALL be sorted in descending order.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-53" target=
+     *      "_blank">Tile Matrix - Table Data Values - Requirement 53</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 53")
+    public void sortedPixelSizes() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            for(final String pyramidTable : this.tileTableNames)
+            {
+                try(PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT pixel_x_size, pixel_y_size FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
+                {
+                    statement.setString(1, pyramidTable);
+
+                    try(final ResultSet resultSet = statement.executeQuery())
+                    {
+                        if(resultSet.isBeforeFirst())
+                        {
+                            resultSet.next();
+
+                            double lastPixelX = resultSet.getDouble("pixel_x_size");
+                            double lastPixelY = resultSet.getDouble("pixel_y_size");
+
+                            while(resultSet.next())
+                            {
+                                final double pixelX = resultSet.getDouble("pixel_x_size");
+                                final double pixelY = resultSet.getDouble("pixel_y_size");
+
+                                assertTrue(lastPixelX > pixelX && lastPixelY > pixelY,
+                                           ErrorMessage.format(ErrorMessageKeys.PIXEL_SIZE_NOT_DECREASING, pyramidTable));
+
+                                lastPixelX = pixelX;
+                                lastPixelY = pixelY;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -545,6 +840,9 @@ public class TileContentsTests extends CommonFixture
 
         return false;
     }
+
+    private boolean hasTileMatrixTable;
+    private boolean hasTileMatrixSetTable;
 
     private final Collection<String> tileTableNames         = new ArrayList<>();
     private final Collection<String> contentsTileTableNames = new ArrayList<>();
