@@ -96,7 +96,7 @@ public final class TableVerifier
     private static void verifyColumns(final Connection                    connection,
                                       final String                        tableName,
                                       final Map<String, ColumnDefinition> requiredColumns,
-                                      final Collection<UniqueDefinition>  uniques) throws SQLException, AssertionError
+                                      final Collection<UniqueDefinition>  uniques) throws SQLException
     {
         try(final Statement statement = connection.createStatement();
             final ResultSet tableInfo = statement.executeQuery(String.format("PRAGMA table_info(%s);", tableName)))
@@ -165,7 +165,7 @@ public final class TableVerifier
 
     private static void verifyForeignKeys(final Connection                connection,
                                           final String                    tableName,
-                                          final Set<ForeignKeyDefinition> requiredForeignKeys) throws AssertionError, SQLException
+                                          final Set<ForeignKeyDefinition> requiredForeignKeys) throws SQLException
     {
         try(final Statement statement = connection.createStatement())
         {
@@ -236,7 +236,7 @@ public final class TableVerifier
 
     private static void verifyGroupUniques(final String                       tableName,
                                            final Iterable<UniqueDefinition>   requiredGroupUniques,
-                                           final Collection<UniqueDefinition> uniques) throws AssertionError
+                                           final Collection<UniqueDefinition> uniques)
     {
         for(final UniqueDefinition groupUnique : requiredGroupUniques)
         {

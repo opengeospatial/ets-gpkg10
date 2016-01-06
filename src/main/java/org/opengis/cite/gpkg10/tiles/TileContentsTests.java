@@ -79,7 +79,7 @@ public class TileContentsTests extends CommonFixture
 
                   this.tileTableNames.add(tableName);
                 }
-                catch(final AssertionError ignore)
+                catch(final Throwable ignore)
                 {
                     // If verification fails- it's not a tiles table
                 }
@@ -278,9 +278,9 @@ public class TileContentsTests extends CommonFixture
                                                                       new ForeignKeyDefinition("gpkg_contents",        "table_name", "table_name"))),
                                           Collections.emptyList());
             }
-            catch(final AssertionError ex)
+            catch(final Throwable th)
             {
-                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_SET_TABLE_DEFINITION, ex.getMessage()));
+                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_SET_TABLE_DEFINITION, th.getMessage()));
             }
         }
     }
@@ -417,9 +417,9 @@ public class TileContentsTests extends CommonFixture
                                           new HashSet<>(Arrays.asList(new ForeignKeyDefinition("gpkg_contents", "table_name", "table_name"))),
                                           Collections.emptyList());
             }
-            catch(final AssertionError ex)
+            catch(final Throwable th)
             {
-                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_TABLE_DEFINITION, ex.getMessage()));
+                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_MATRIX_TABLE_DEFINITION, th.getMessage()));
             }
         }
     }
@@ -797,6 +797,54 @@ public class TileContentsTests extends CommonFixture
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Each tile matrix set in a GeoPackage SHALL be stored in a different tile
+     * pyramid user data table or updateable view with a unique name that SHALL
+     * have a column named "id" with column type INTEGER and <em>PRIMARY KEY
+     * AUTOINCREMENT</em> column constraints per Clause 2.2.8.1.1 <a
+     * href="http://www.geopackage.org/spec/#tiles_user_tables_data_table_definition">
+     * Table Definition</a>, <a
+     * href="http://www.geopackage.org/spec/#example_tiles_table_cols">Tiles
+     * Table or View Definition</a> and <a
+     * href="http://www.geopackage.org/spec/#example_tiles_table_insert_sql">
+     * EXAMPLE: tiles table Insert Statement (Informative)</a>.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-54" target=
+     *      "_blank">Tile Pyramid User Data Tables - Table Definition - Requirement 54</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 54")
+    public void tilesTableDefinitions() throws SQLException
+    {
+        final Map<String, ColumnDefinition> expectedColumns = new HashMap<>();
+
+        expectedColumns.put("id",          new ColumnDefinition("INTEGER", false, true,  true,  null));
+        expectedColumns.put("zoom_level",  new ColumnDefinition("INTEGER", true,  false, false, null));
+        expectedColumns.put("tile_column", new ColumnDefinition("INTEGER", true,  false, false, null));
+        expectedColumns.put("tile_row",    new ColumnDefinition("INTEGER", true,  false, false, null));
+        expectedColumns.put("tile_data",   new ColumnDefinition("BLOB",    true,  false, false, null));
+
+        for(final String tableName : this.tileTableNames)
+        {
+            try
+            {
+                TableVerifier.verifyTable(this.databaseConnection,
+                                          tableName,
+                                          expectedColumns,
+                                          Collections.emptySet(),
+                                          new HashSet<>(Arrays.asList(new UniqueDefinition("zoom_level", "tile_column", "tile_row"))));
+            }
+            catch(final Throwable th)
+            {
+                fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_PYRAMID_USER_DATA_TABLE_DEFINITION,
+                                         tableName,
+                                         th.getMessage()));
             }
         }
     }
