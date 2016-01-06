@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
-import javax.print.attribute.standard.Severity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -153,6 +152,7 @@ public class TileContentsTests extends CommonFixture
 
                         if(zoomLevel == lastZoomLevel + 1)
                         {
+                            //noinspection MagicNumber
                             assertTrue(isEqual((lastPixelXSize / 2.0), pixelXSize) &&
                                        isEqual((lastPixelYSize / 2.0), pixelYSize),
                                        ErrorMessage.format(ErrorMessageKeys.VALUES_DO_NOT_VARY_BY_FACTOR_OF_TWO,
@@ -770,7 +770,7 @@ public class TileContentsTests extends CommonFixture
         {
             for(final String pyramidTable : this.tileTableNames)
             {
-                try(PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT pixel_x_size, pixel_y_size FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT pixel_x_size, pixel_y_size FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
                 {
                     statement.setString(1, pyramidTable);
 
@@ -845,6 +845,58 @@ public class TileContentsTests extends CommonFixture
                 fail(ErrorMessage.format(ErrorMessageKeys.BAD_TILE_PYRAMID_USER_DATA_TABLE_DEFINITION,
                                          tableName,
                                          th.getMessage()));
+            }
+        }
+    }
+
+    /**
+     * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
+     * (tm) table, the tile pyramid (tp) user data table {@code zoom_level}
+     * column value in a GeoPackage SHALL be in the range min(tm.zoom_level) <=
+     * tp.zoom_level <= max(tm.zoom_level).
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-55" target=
+     *      "_blank">Tile Pyramid User Data Tables - Table Data Values - Requirement 55</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 55")
+    public void zoomLevelRange() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            for(final String tableName : this.tileTableNames)
+            {
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT MIN(zoom_level) AS min_gtm_zoom, MAX(zoom_level) AS max_gtm_zoom FROM gpkg_tile_matrix WHERE table_name = ?;"))
+                {
+                    statement.setString(1, tableName);
+
+                    try(final ResultSet minMaxZoom = statement.executeQuery())
+                    {
+                        final int minZoom = minMaxZoom.getInt("min_gtm_zoom");
+                        final int maxZoom = minMaxZoom.getInt("max_gtm_zoom");
+
+                        if(!minMaxZoom.wasNull())
+                        {
+                            try(final PreparedStatement zoomStatement = this.databaseConnection.prepareStatement(String.format("SELECT zoom_level FROM %s WHERE zoom_level < ? OR zoom_level > ?", tableName)))
+                            {
+                                zoomStatement.setInt(1, minZoom);
+                                zoomStatement.setInt(2, maxZoom);
+
+                                try(final ResultSet invalidZooms = zoomStatement.executeQuery())
+                                {
+                                    if(invalidZooms.next())
+                                    {
+                                        fail(ErrorMessage.format(ErrorMessageKeys.UNDEFINED_ZOOM_LEVEL,
+                                                                 tableName,
+                                                                 invalidZooms.getInt("zoom_level")));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

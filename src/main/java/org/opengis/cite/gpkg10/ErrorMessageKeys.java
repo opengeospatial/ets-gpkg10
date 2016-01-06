@@ -58,4 +58,5 @@ public class ErrorMessageKeys {
     public static final String NON_POSITIVE_PIXEL_Y_SIZE = "NonPositivePixelYSize";
     public static final String PIXEL_SIZE_NOT_DECREASING = "PixelSizeNotDecreasing";
     public static final String BAD_TILE_PYRAMID_USER_DATA_TABLE_DEFINITION = "BadTilePyramidUserDataTableDefinition";
+    public static final String UNDEFINED_ZOOM_LEVEL = "UndefinedZoomLevel";
 }
