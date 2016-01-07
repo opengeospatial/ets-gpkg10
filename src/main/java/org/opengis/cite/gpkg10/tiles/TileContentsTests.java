@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
@@ -54,6 +55,11 @@ import static org.testng.AssertJUnit.fail;
  */
 public class TileContentsTests extends CommonFixture
 {
+    /**
+     * Sets up variables used across methods
+     *
+     * @throws SQLException if there is a database error
+     */
     @BeforeClass
     public void setUp() throws SQLException
     {
@@ -868,14 +874,14 @@ public class TileContentsTests extends CommonFixture
         {
             for(final String tableName : this.tileTableNames)
             {
-                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT MIN(zoom_level) AS min_gtm_zoom, MAX(zoom_level) AS max_gtm_zoom FROM gpkg_tile_matrix WHERE table_name = ?;"))
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT MIN(zoom_level) AS min_zoom, MAX(zoom_level) AS max_zoom FROM gpkg_tile_matrix WHERE table_name = ?;"))
                 {
                     statement.setString(1, tableName);
 
                     try(final ResultSet minMaxZoom = statement.executeQuery())
                     {
-                        final int minZoom = minMaxZoom.getInt("min_gtm_zoom");
-                        final int maxZoom = minMaxZoom.getInt("max_gtm_zoom");
+                        final int minZoom = minMaxZoom.getInt("min_zoom");
+                        final int maxZoom = minMaxZoom.getInt("max_zoom");
 
                         if(!minMaxZoom.wasNull())
                         {
@@ -894,6 +900,104 @@ public class TileContentsTests extends CommonFixture
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
+     * (tm) table, the tile pyramid (tp) user data table {@code tile_column}
+     * column value in a GeoPackage SHALL be in the range 0 <= tp.tile_column
+     * <= tm.matrix_width - 1 where the tm and tp {@code zoom_level} column
+     * values are equal.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-56" target=
+     *      "_blank">Tile Pyramid User Data Tables - Table Data Values - Requirement 56</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 56")
+    public void tileColumnRange() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            for(final String tableName : this.tileTableNames)
+            {
+                final String query = String.format("SELECT zoom_level as zl, matrix_width as width " +
+                                                   "FROM   gpkg_tile_matrix "        +
+                                                   "WHERE  table_name = ? "       +
+                                                   "AND (zoom_level in (SELECT zoom_level FROM %1$s WHERE tile_column < 0) " +
+                                                   "OR  (EXISTS(SELECT NULL FROM %1$s WHERE zoom_level = zl AND tile_column > width - 1)));",
+                                                   tableName);
+
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement(query))
+                {
+                    statement.setString(1, tableName);
+
+                    try(final ResultSet resultSet = statement.executeQuery())
+                    {
+                        while(resultSet.next())
+                        {
+                            final int matrixWidth = resultSet.getInt("width");
+                            final int zoomLevel   = resultSet.getInt("zl");
+
+                            fail(ErrorMessage.format(ErrorMessageKeys.TILE_COLUMN_OUT_OF_RANGE,
+                                                     tableName,
+                                                     matrixWidth-1,
+                                                     zoomLevel));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
+     * (tm) table, the tile pyramid (tp) user data table {@code tile_row}
+     * column value in a GeoPackage SHALL be in the range 0 <= tp.tile_row <=
+     * tm.matrix_height - 1 where the tm and tp {@code zoom_level} column
+     * values are equal.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-57" target=
+     *      "_blank">Tile Pyramid User Data Tables - Table Data Values - Requirement 57</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 57")
+    public void tileRowRange() throws SQLException
+    {
+        if(this.hasTileMatrixTable)
+        {
+            for(final String tableName : this.tileTableNames)
+            {
+                final String query = String.format("SELECT zoom_level as zl, matrix_height as height " +
+                                                   "FROM   gpkg_tile_matrix "        +
+                                                   "WHERE  table_name = ? "       +
+                                                   "AND (zoom_level in (SELECT zoom_level FROM %1$s WHERE tile_row < 0) " +
+                                                   "OR  (EXISTS(SELECT NULL FROM %1$s WHERE zoom_level = zl AND tile_row > height - 1)));",
+                                                   tableName);
+
+                try(final PreparedStatement statement = this.databaseConnection.prepareStatement(query))
+                {
+                    statement.setString(1, tableName);
+
+                    try(final ResultSet resultSet = statement.executeQuery())
+                    {
+                        while(resultSet.next())
+                        {
+                            final int matrixHeight = resultSet.getInt("height");
+                            final int zoomLevel   = resultSet.getInt("zl");
+
+                            fail(ErrorMessage.format(ErrorMessageKeys.TILE_ROW_OUT_OF_RANGE,
+                                                     tableName,
+                                                     matrixHeight-1,
+                                                     zoomLevel));
                         }
                     }
                 }
