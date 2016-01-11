@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
@@ -247,10 +246,10 @@ public class TileContentsTests extends CommonFixture
 
     /**
      * A GeoPackage that contains a tile pyramid user data table SHALL contain
-     * {@code gpkg_tile_matrix_set} table or view per <a
-     * href="http://www.geopackage.org/spec/#tile_matrix_set_data_table_definition">
-     * Table Definition</a>, <a
-     * href="http://www.geopackage.org/spec/#gpkg_tile_matrix_set_cols">Tile
+     * {@code gpkg_tile_matrix_set} table or view per <a href=
+     * "http://www.geopackage.org/spec/#tile_matrix_set_data_table_definition">
+     * Table Definition</a>, <a href=
+     * "http://www.geopackage.org/spec/#gpkg_tile_matrix_set_cols">Tile
      * Matrix Set Table or View Definition</a> and <a
      * href="http://www.geopackage.org/spec/#gpkg_tile_matrix_set_sql">
      * gpkg_tile_matrix_set Table Creation SQL</a>.
@@ -452,10 +451,16 @@ public class TileContentsTests extends CommonFixture
             try(final Statement statement = this.databaseConnection.createStatement();
                 final ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_tile_matrix AS tm WHERE table_name NOT IN (SELECT table_name FROM gpkg_contents AS gc WHERE tm.table_name = gc.table_name AND gc.data_type = 'tiles');"))
             {
-                if(resultSet.next())
+                final Collection<String> unreferencedTables = new LinkedList<>();
+
+                while(resultSet.next())
                 {
-                    fail(ErrorMessage.format(ErrorMessageKeys.BAD_MATRIX_CONTENTS_REFERENCE, resultSet.getString("table_name")));
+                    unreferencedTables.add(resultSet.getString("table_name"));
                 }
+
+                assertTrue(unreferencedTables.isEmpty(),
+                           ErrorMessage.format(ErrorMessageKeys.BAD_MATRIX_CONTENTS_REFERENCES,
+                                               String.join(", ", unreferencedTables)));
             }
         }
     }
@@ -532,49 +537,69 @@ public class TileContentsTests extends CommonFixture
     public void tileMatrixDimensionAgreement() throws SQLException
     {
         if(this.hasTileMatrixTable &&
-           DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_tile_set_matrix"))
+           this.hasTileMatrixSetTable)
         {
+            final Map<String, Collection<Integer>> tableNamesWithBadZooms = new HashMap<>();
+
             for(final String tableName : this.tileTableNames)
             {
-                try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT table_name, zoom_level, pixel_x_size, pixel_y_size, matrix_width, matrix_height, tile_width, tile_height FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
+                try(final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT min_x, min_y, max_x, max_y FROM gpkg_tile_set_matrix WHERE table_name = ?"))
                 {
-                    statement.setString(1, tableName);
+                    preparedStatement.setString(1, tableName);
 
-                    try(final ResultSet pixelInfo = statement.executeQuery())
+                    try(final ResultSet boundingBox = preparedStatement.executeQuery())
                     {
-                        while(pixelInfo.next())
+                        if(boundingBox.next())
                         {
-                            final double pixelXSize   = pixelInfo.getDouble("pixel_x_size");
-                            final double pixelYSize   = pixelInfo.getDouble("pixel_y_size");
-                            final int    zoomLevel    = pixelInfo.getInt   ("zoom_level");
-                            final double matrixHeight = pixelInfo.getInt   ("matrix_height");
-                            final double matrixWidth  = pixelInfo.getInt   ("matrix_width");
-                            final double tileHeight   = pixelInfo.getInt   ("tile_height");
-                            final double tileWidth    = pixelInfo.getInt   ("tile_width");
+                            final double width  = boundingBox.getDouble("max_x") - boundingBox.getDouble("min_x");
+                            final double height = boundingBox.getDouble("max_y") - boundingBox.getDouble("min_y");
 
-                            try(final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT min_x, min_y, max_x, max_y FROM gpkg_tile_set_matrix WHERE table_name = ?"))
+                            final Collection<Integer> zoomLevels = new ArrayList<>();
+
+                            try(final PreparedStatement statement = this.databaseConnection.prepareStatement("SELECT zoom_level, pixel_x_size, pixel_y_size, matrix_width, matrix_height, tile_width, tile_height FROM gpkg_tile_matrix WHERE table_name = ? ORDER BY zoom_level ASC;"))
                             {
-                                preparedStatement.setString(1, tableName);
+                                statement.setString(1, tableName);
 
-                                try(final ResultSet boundingBox = preparedStatement.executeQuery())
+                                try(final ResultSet pixelInfo = statement.executeQuery())
                                 {
-                                    if(boundingBox.next())
+                                    while(pixelInfo.next())
                                     {
-                                        final double width  = boundingBox.getDouble("max_x") - boundingBox.getDouble("min_x");
-                                        final double height = boundingBox.getDouble("max_y") - boundingBox.getDouble("min_y");
+                                        final double pixelXSize   = pixelInfo.getDouble("pixel_x_size");
+                                        final double pixelYSize   = pixelInfo.getDouble("pixel_y_size");
+                                        final double matrixHeight = pixelInfo.getInt   ("matrix_height");
+                                        final double matrixWidth  = pixelInfo.getInt   ("matrix_width");
+                                        final double tileHeight   = pixelInfo.getInt   ("tile_height");
+                                        final double tileWidth    = pixelInfo.getInt   ("tile_width");
 
-                                        assertTrue(isEqual(pixelXSize, (width  / matrixWidth)  / tileWidth) &&
-                                                   isEqual(pixelYSize, (height / matrixHeight) / tileHeight),
-                                                   ErrorMessage.format(ErrorMessageKeys.BAD_PIXEL_DIMENSIONS,
-                                                                       tableName,
-                                                                       zoomLevel));
+                                        if(!isEqual(pixelXSize, (width  / matrixWidth)  / tileWidth) ||
+                                           !isEqual(pixelYSize, (height / matrixHeight) / tileHeight))
+                                        {
+                                            zoomLevels.add(pixelInfo.getInt("zoom_level"));
+                                        }
                                     }
                                 }
+                            }
+
+                            if(!zoomLevels.isEmpty())
+                            {
+                                tableNamesWithBadZooms.put(tableName, zoomLevels);
                             }
                         }
                     }
                 }
             }
+
+            assertTrue(!tableNamesWithBadZooms.isEmpty(),
+                       ErrorMessage.format(ErrorMessageKeys.BAD_PIXEL_DIMENSIONS,
+                                           tableNamesWithBadZooms.entrySet()
+                                                                 .stream()
+                                                                 .map(entrySet -> String.format("%s: %s",
+                                                                                                entrySet.getKey(),
+                                                                                                entrySet.getValue()
+                                                                                                        .stream()
+                                                                                                        .map(Object::toString)
+                                                                                                        .collect(Collectors.joining(", "))))
+                                                                 .collect(Collectors.joining("\n"))));
         }
     }
 

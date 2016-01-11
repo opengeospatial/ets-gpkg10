@@ -46,7 +46,7 @@ public class ErrorMessageKeys {
     public static final String BAD_MATRIX_SET_SRS_REFERENCE = "BadMatrixSetSrsReference";
     public static final String TILE_MATRIX_TABLE_DOES_NOT_EXIST = "TileMatrixTableDoesNotExist";
     public static final String BAD_TILE_MATRIX_TABLE_DEFINITION = "BadTileMatrixTableDefinition";
-    public static final String BAD_MATRIX_CONTENTS_REFERENCE = "BadMatrixContentsReference";
+    public static final String BAD_MATRIX_CONTENTS_REFERENCES = "BadMatrixContentsReferences";
     public static final String MISSING_TILE_MATRIX_ENTRY = "MissingTileMatrixEntry";
     public static final String BAD_PIXEL_DIMENSIONS = "BadPixelDimensions";
     public static final String NEGATIVE_ZOOM_LEVEL = "NegativeZoomLevel";
