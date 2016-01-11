@@ -115,12 +115,14 @@ public class TileContentsTests extends CommonFixture
     @Test(description = "See OGC 12-128r12: Requirement 34")
     public void tilesTablesAreReferenced() throws SQLException
     {
-        for(final String tableName: this.tileTableNames)
-        {
-            assertTrue(this.contentsTileTableNames.stream()
-                                                  .anyMatch(contentsName -> contentsName.equalsIgnoreCase(tableName)),
-                       ErrorMessage.format(ErrorMessageKeys.TILES_TABLE_NOT_REFERENCED_IN_CONTENTS, tableName));
-        }
+        final Collection<String> missingTileTableNames = this.tileTableNames
+                                                             .stream()
+                                                             .filter(tableName -> !this.contentsTileTableNames.contains(tableName))
+                                                             .collect(Collectors.toList());
+
+        assertTrue(missingTileTableNames.isEmpty(),
+                   ErrorMessage.format(ErrorMessageKeys.TILES_TABLES_NOT_REFERENCED_IN_CONTENTS,
+                                       String.join(", ", missingTileTableNames)));
     }
 
     /**
