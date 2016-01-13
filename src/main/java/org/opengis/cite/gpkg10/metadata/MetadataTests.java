@@ -148,7 +148,7 @@ public class MetadataTests extends CommonFixture
         if(this.hasMetadataTable)
         {
             final List<String> invalidScopeValues = this.metadataValues.stream()
-                                                        .filter(MetadataTests.Metadata::hasValidMdScope)
+                                                        .filter(MetadataTests.Metadata::hasInvalidScope)
                                                         .map(MetadataTests.Metadata::getMdScope)
                                                         .collect(Collectors.toList());
 
@@ -208,6 +208,34 @@ public class MetadataTests extends CommonFixture
         }
     }
 
+    /**
+     * Every {@code gpkg_metadata_reference} table reference scope column value
+     * SHALL be one of 'geopackage', 'table', 'column', 'row', 'row/col' in
+     * lowercase.
+     *
+     * @see <a href="http://www.geopackage.org/spec/#_requirement-95" target=
+     *      "_blank">F.8. Metadata - Requirement 96</a>
+     *
+     * @throws SQLException
+     *             If an SQL query causes an error
+     */
+    @Test(description = "See OGC 12-128r12: Requirement 96")
+    public void metadataReferencesScopeValues() throws SQLException
+    {
+        if(this.hasMetadataReferenceTable)
+        {
+            final Collection<String> invalidScopeValues = this.metadataReferenceValues
+                                                              .stream()
+                                                              .filter(MetadataTests.MetadataReference::hasInvalidScope)
+                                                              .map(MetadataTests.MetadataReference::getReferenceScope)
+                                                              .collect(Collectors.toList());
+
+            assertTrue(invalidScopeValues.isEmpty(),
+                       ErrorMessage.format(ErrorMessageKeys.INVALID_METADATA_REFERENCE_SCOPE,
+                                           String.join(", ", invalidScopeValues)));
+        }
+    }
+
     private static Integer nullSafeGet(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         final Integer value = resultSet.getInt(columnLabel);
@@ -235,9 +263,9 @@ public class MetadataTests extends CommonFixture
             return this.mdScope;
         }
 
-        public boolean hasValidMdScope()
+        public boolean hasInvalidScope()
         {
-            return validScopes.contains(this.mdScope.toLowerCase());
+            return !validScopes.contains(this.mdScope.toLowerCase());
         }
 
         private final int    id;
@@ -318,7 +346,18 @@ public class MetadataTests extends CommonFixture
             return this.mdParentId;
         }
 
+        public boolean hasInvalidScope()
+        {
+            return !validScopes.contains(this.referenceScope.toLowerCase());
+        }
+
         private final String  referenceScope;
+
+        private static final Collection<String> validScopes = Arrays.asList("geopackage",
+                                                                            "table",
+                                                                            "column",
+                                                                            "row",
+                                                                            "row/col");
         private final String  tableName;
         private final String  columnName;
         private final Integer rowIdValue;
