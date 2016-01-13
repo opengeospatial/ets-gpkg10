@@ -61,4 +61,8 @@ public class ErrorMessageKeys {
     public static final String UNDEFINED_ZOOM_LEVEL = "UndefinedZoomLevel";
     public static final String TILE_COLUMN_OUT_OF_RANGE = "TileColumnOutOfRange";
     public static final String TILE_ROW_OUT_OF_RANGE = "TileRowOutOfRange";
+    public static final String BAD_METADATA_TABLE_DEFINITION = "BadMetadataTableDefinition";
+    public static final String INVALID_METADATA_SCOPE = "InvalidMetadataScope";
+    public static final String MISSING_METADATA_REFERENCE_TABLE = "MissingMetadataReferenceTable";
+    public static final String BAD_METADATA_REFERENCE_TABLE_DEFINITION = "BadMetadataReferenceTableDefinition";
 }

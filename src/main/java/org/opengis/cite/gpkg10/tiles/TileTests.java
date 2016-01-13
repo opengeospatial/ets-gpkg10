@@ -39,20 +39,20 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
 /**
- * Defines test methods that apply to descriptive information about the contents
- * of a GeoPackage's content table as it pertains to tiles.
+ * Defines test methods that apply to descriptive information about a
+ * GeoPackage's content as it pertains to tiles.
  *
  * <p style="margin-bottom: 0.5em">
  * <strong>Sources</strong>
  * </p>
  * <ul>
- * <li><a href="http://www.geopackage.org/spec/#_contents_3" target= "_blank">
- * GeoPackage Encoding Standard - 2.2.2. Contents</a> (OGC 12-128r12)</li>
+ * <li><a href="http://www.geopackage.org/spec/#tiles" target= "_blank">
+ * GeoPackage Encoding Standard - 2.2. Tiles</a> (OGC 12-128r12)</li>
  * </ul>
  *
  * @author Luke Lambert
  */
-public class TileContentsTests extends CommonFixture
+public class TileTests extends CommonFixture
 {
     /**
      * Sets up variables used across methods

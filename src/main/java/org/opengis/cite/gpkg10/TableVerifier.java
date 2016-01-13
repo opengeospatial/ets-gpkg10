@@ -111,7 +111,7 @@ public final class TableVerifier
                                                  tableInfo.getBoolean("notnull"),
                                                  tableInfo.getBoolean("pk"),
                                                  uniques.stream().anyMatch(unique -> unique.equals(columnName)),
-                                                 tableInfo.getString ("dflt_value")));   // TODO manipulate values so that they're "normalized" sql expressions, e.g. "" -> '', strftime ( '%Y-%m-%dT%H:%M:%fZ' , 'now' ) -> strftime('%Y-%m-%dT%H:%M:%fZ','now')
+                                                 tableInfo.getString ("dflt_value")));
             }
 
             // Make sure the required fields exist in the table
