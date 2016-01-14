@@ -66,4 +66,6 @@ public class ErrorMessageKeys {
     public static final String MISSING_METADATA_REFERENCE_TABLE = "MissingMetadataReferenceTable";
     public static final String BAD_METADATA_REFERENCE_TABLE_DEFINITION = "BadMetadataReferenceTableDefinition";
     public static final String INVALID_METADATA_REFERENCE_SCOPE = "InvalidMetadataReferenceScope";
+    public static final String BAD_METADATA_REFERENCE_SCOPE_COLUMN_NAME_AGREEMENT = "BadMetadataReferenceScopeColumnNameAgreement";
+    public static final String INVALID_METADATA_REFERENCE_TABLE = "InvalidMetadataReferenceTable";
 }
