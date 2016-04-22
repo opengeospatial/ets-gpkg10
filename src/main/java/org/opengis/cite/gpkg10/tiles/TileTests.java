@@ -543,7 +543,7 @@ public class TileTests extends CommonFixture
 
             for(final String tableName : this.tileTableNames)
             {
-                try(final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT min_x, min_y, max_x, max_y FROM gpkg_tile_set_matrix WHERE table_name = ?"))
+                try(final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT min_x, min_y, max_x, max_y FROM gpkg_tile_matrix_set WHERE table_name = ?"))
                 {
                     preparedStatement.setString(1, tableName);
 
@@ -589,7 +589,7 @@ public class TileTests extends CommonFixture
                 }
             }
 
-            assertTrue(!tableNamesWithBadZooms.isEmpty(),
+            assertTrue(tableNamesWithBadZooms.isEmpty(),
                        ErrorMessage.format(ErrorMessageKeys.BAD_PIXEL_DIMENSIONS,
                                            tableNamesWithBadZooms.entrySet()
                                                                  .stream()
@@ -795,6 +795,7 @@ public class TileTests extends CommonFixture
      *
      * @throws SQLException
      *             If an SQL query causes an error
+     *
      */
     @Test(description = "See OGC 12-128r12: Requirement 53")
     public void sortedPixelSizes() throws SQLException
@@ -863,7 +864,7 @@ public class TileTests extends CommonFixture
         expectedColumns.put("tile_row",    new ColumnDefinition("INTEGER", true,  false, false, null));
         expectedColumns.put("tile_data",   new ColumnDefinition("BLOB",    true,  false, false, null));
 
-        for(final String tableName : this.tileTableNames)
+        for(final String tableName : this.contentsTileTableNames)
         {
             try
             {
