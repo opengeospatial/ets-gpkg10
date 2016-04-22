@@ -25,23 +25,27 @@ public final class TableVerifier
 
     }
 
-    public static void verifyTable(final Connection connection, final TableDefinition table) throws SQLException
+    public static void verifyTable(final Connection                    connection,
+                                   final String                        tableName,
+                                   final Map<String, ColumnDefinition> expectedColumns,
+                                   final Set<ForeignKeyDefinition>     expectedForeinKeys,
+                                   final Iterable<UniqueDefinition>    expectedGroupUniques) throws SQLException
     {
-        verifyTableDefinition(connection, table.getName());
+        verifyTableDefinition(connection, tableName);
 
-        final Set<UniqueDefinition> uniques = getUniques(connection, table.getName());
+        final Set<UniqueDefinition> uniques = getUniques(connection, tableName);
 
         verifyColumns(connection,
-                      table.getName(),
-                      table.getColumns(),
+                      tableName,
+                      expectedColumns,
                       uniques);
 
         verifyForeignKeys(connection,
-                          table.getName(),
-                          table.getForeignKeys());
+                          tableName,
+                          expectedForeinKeys);
 
-        verifyGroupUniques(table.getName(),
-                           table.getGroupUniques(),
+        verifyGroupUniques(tableName,
+                           expectedGroupUniques,
                            uniques);
     }
 
@@ -92,7 +96,7 @@ public final class TableVerifier
     private static void verifyColumns(final Connection                    connection,
                                       final String                        tableName,
                                       final Map<String, ColumnDefinition> requiredColumns,
-                                      final Collection<UniqueDefinition>  uniques) throws SQLException, AssertionError
+                                      final Collection<UniqueDefinition>  uniques) throws SQLException
     {
         try(final Statement statement = connection.createStatement();
             final ResultSet tableInfo = statement.executeQuery(String.format("PRAGMA table_info(%s);", tableName)))
@@ -107,7 +111,7 @@ public final class TableVerifier
                                                  tableInfo.getBoolean("notnull"),
                                                  tableInfo.getBoolean("pk"),
                                                  uniques.stream().anyMatch(unique -> unique.equals(columnName)),
-                                                 tableInfo.getString ("dflt_value")));   // TODO manipulate values so that they're "normalized" sql expressions, e.g. "" -> '', strftime ( '%Y-%m-%dT%H:%M:%fZ' , 'now' ) -> strftime('%Y-%m-%dT%H:%M:%fZ','now')
+                                                 tableInfo.getString ("dflt_value")));
             }
 
             // Make sure the required fields exist in the table
@@ -161,7 +165,7 @@ public final class TableVerifier
 
     private static void verifyForeignKeys(final Connection                connection,
                                           final String                    tableName,
-                                          final Set<ForeignKeyDefinition> requiredForeignKeys) throws AssertionError, SQLException
+                                          final Set<ForeignKeyDefinition> requiredForeignKeys) throws SQLException
     {
         try(final Statement statement = connection.createStatement())
         {
@@ -232,7 +236,7 @@ public final class TableVerifier
 
     private static void verifyGroupUniques(final String                       tableName,
                                            final Iterable<UniqueDefinition>   requiredGroupUniques,
-                                           final Collection<UniqueDefinition> uniques) throws AssertionError
+                                           final Collection<UniqueDefinition> uniques)
     {
         for(final UniqueDefinition groupUnique : requiredGroupUniques)
         {

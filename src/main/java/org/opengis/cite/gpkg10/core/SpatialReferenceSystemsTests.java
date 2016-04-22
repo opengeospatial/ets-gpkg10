@@ -4,7 +4,6 @@ import org.opengis.cite.gpkg10.ColumnDefinition;
 import org.opengis.cite.gpkg10.CommonFixture;
 import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
-import org.opengis.cite.gpkg10.TableDefinition;
 import org.opengis.cite.gpkg10.TableVerifier;
 import org.testng.annotations.Test;
 
@@ -12,11 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertTrue;
@@ -58,21 +56,27 @@ public class SpatialReferenceSystemsTests extends CommonFixture {
      *             If an SQL query causes an error
      */
     @Test(description = "See OGC 12-128r12: Requirement 10")
-    public void srsTableDefinition() throws SQLException {
-        try {
+    public void srsTableDefinition() throws SQLException
+    {
+        try
+        {
             final Map<String, ColumnDefinition> spatialReferenceSystemColumns = new HashMap<>();
 
-            spatialReferenceSystemColumns.put("srs_name", new ColumnDefinition("TEXT", true, false, false, null));
-            spatialReferenceSystemColumns.put("srs_id", new ColumnDefinition("INTEGER", true, true, true, null));
-            spatialReferenceSystemColumns.put("organization", new ColumnDefinition("TEXT", true, false, false, null));
-            spatialReferenceSystemColumns.put("organization_coordsys_id",
-                    new ColumnDefinition("INTEGER", true, false, false, null));
-            spatialReferenceSystemColumns.put("definition", new ColumnDefinition("TEXT", true, false, false, null));
-            spatialReferenceSystemColumns.put("description", new ColumnDefinition("TEXT", false, false, false, null));
+            spatialReferenceSystemColumns.put("srs_name",                 new ColumnDefinition("TEXT",    true,  false, false, null));
+            spatialReferenceSystemColumns.put("srs_id",                   new ColumnDefinition("INTEGER", true,  true,  true,  null));
+            spatialReferenceSystemColumns.put("organization",             new ColumnDefinition("TEXT",    true,  false, false, null));
+            spatialReferenceSystemColumns.put("organization_coordsys_id", new ColumnDefinition("INTEGER", true,  false, false, null));
+            spatialReferenceSystemColumns.put("definition",               new ColumnDefinition("TEXT",    true,  false, false, null));
+            spatialReferenceSystemColumns.put("description",              new ColumnDefinition("TEXT",    false, false, false, null));
 
             TableVerifier.verifyTable(this.databaseConnection,
-                    new TableDefinition("gpkg_spatial_ref_sys", spatialReferenceSystemColumns));
-        } catch (final Throwable th) {
+                                      "gpkg_spatial_ref_sys",
+                                      spatialReferenceSystemColumns,
+                                      Collections.emptySet(),
+                                      Collections.emptyList());
+        }
+        catch(final Throwable th)
+        {
             fail(ErrorMessage.format(ErrorMessageKeys.BAD_SRS_TABLE_DEFINITION, th.getMessage()));
         }
     }
