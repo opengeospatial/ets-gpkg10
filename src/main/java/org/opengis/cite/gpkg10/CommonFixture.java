@@ -49,6 +49,7 @@ public class CommonFixture {
                     String.format("Suite attribute value is not a File: %s", SuiteAttribute.TEST_SUBJ_FILE.getName()));
         }
         this.gpkgFile = File.class.cast(testFile);
+        this.gpkgFile.setWritable(false);
         final SQLiteConfig dbConfig = new SQLiteConfig();
         dbConfig.setSynchronous(SQLiteConfig.SynchronousMode.OFF);
         dbConfig.setJournalMode(SQLiteConfig.JournalMode.MEMORY);

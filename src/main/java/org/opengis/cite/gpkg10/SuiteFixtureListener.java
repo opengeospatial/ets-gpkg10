@@ -76,9 +76,9 @@ public class SuiteFixtureListener implements ISuiteListener {
         if (TestSuiteLogger.isLoggable(Level.CONFIG)) {
             return;
         }
-        File testSubjFile = (File) suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName());
-        if (testSubjFile.exists()) {
-            testSubjFile.delete();
-        }
+//        File testSubjFile = (File) suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName());
+//        if (testSubjFile.exists()) {
+//            testSubjFile.delete();
+//        }
     }
 }

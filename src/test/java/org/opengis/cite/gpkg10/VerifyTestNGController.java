@@ -49,11 +49,16 @@ public class VerifyTestNGController {
 
     @Test
     public void cleanTestRun() throws Exception {
-        URL testSubject = getClass().getResource("/gpkg/simple_sewer_features.gpkg");
+
+        URL testSubject = ClassLoader.getSystemResource("gpkg/simple_sewer_features.gpkg");
+
         this.testRunProps.setProperty(TestRunArg.IUT.toString(), testSubject.toURI().toString());
         ByteArrayOutputStream outStream = new ByteArrayOutputStream(1024);
         this.testRunProps.storeToXML(outStream, "Integration test");
+
         Document testRunArgs = docBuilder.parse(new ByteArrayInputStream(outStream.toByteArray()));
+
+        // set up the test controller and run the tests
         TestNGController controller = new TestNGController();
         Source results = controller.doTestRun(testRunArgs);
         String xpath = "/testng-results/@failed";

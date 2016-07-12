@@ -886,8 +886,8 @@ public class TileTests extends CommonFixture
     /**
      * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
      * (tm) table, the tile pyramid (tp) user data table {@code zoom_level}
-     * column value in a GeoPackage SHALL be in the range min(tm.zoom_level) <=
-     * tp.zoom_level <= max(tm.zoom_level).
+     * column value in a GeoPackage SHALL be in the range {@code min(tm.zoom_level) <=
+     * tp.zoom_level <= max(tm.zoom_level)}.
      *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-55" target=
      *      "_blank">Tile Pyramid User Data Tables - Table Data Values - Requirement 55</a>
@@ -938,8 +938,8 @@ public class TileTests extends CommonFixture
     /**
      * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
      * (tm) table, the tile pyramid (tp) user data table {@code tile_column}
-     * column value in a GeoPackage SHALL be in the range 0 <= tp.tile_column
-     * <= tm.matrix_width - 1 where the tm and tp {@code zoom_level} column
+     * column value in a GeoPackage SHALL be in the range {@code <= tp.tile_column
+     * <= tm.matrix_width - 1} where the tm and tp {@code zoom_level} column
      * values are equal.
      *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-56" target=
@@ -987,8 +987,8 @@ public class TileTests extends CommonFixture
     /**
      * For each distinct {@code table_name} from the {@code gpkg_tile_matrix}
      * (tm) table, the tile pyramid (tp) user data table {@code tile_row}
-     * column value in a GeoPackage SHALL be in the range 0 <= tp.tile_row <=
-     * tm.matrix_height - 1 where the tm and tp {@code zoom_level} column
+     * column value in a GeoPackage SHALL be in the range {@code 0 <= tp.tile_row <=
+     * tm.matrix_height - 1} where the tm and tp {@code zoom_level} column
      * values are equal.
      *
      * @see <a href="http://www.geopackage.org/spec/#_requirement-57" target=

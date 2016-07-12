@@ -141,8 +141,6 @@ public class MetadataTests extends CommonFixture
      * @see <a href="http://www.geopackage.org/spec/#_requirement-94" target=
      *      "_blank">F.8. Metadata - Requirement 94</a>
      *
-     * @throws SQLException
-     *             If an SQL query causes an error
      */
     @Test(description = "See OGC 12-128r12: Requirement 94")
     public void metadataScopeValues()
@@ -173,11 +171,9 @@ public class MetadataTests extends CommonFixture
      * @see <a href="http://www.geopackage.org/spec/#_requirement-95" target=
      *      "_blank">F.8. Metadata - Requirement 95</a>
      *
-     * @throws SQLException
-     *             If an SQL query causes an error
      */
     @Test(description = "See OGC 12-128r12: Requirement 95")
-    public void metadataReferencesTableDefinition() throws SQLException
+    public void metadataReferencesTableDefinition()
     {
         if(this.hasMetadataTable)
         {
@@ -218,8 +214,6 @@ public class MetadataTests extends CommonFixture
      * @see <a href="http://www.geopackage.org/spec/#_requirement-96" target=
      *      "_blank">F.8. Metadata - Requirement 96</a>
      *
-     * @throws SQLException
-     *             If an SQL query causes an error
      */
     @Test(description = "See OGC 12-128r12: Requirement 96")
     public void metadataReferencesScopeValues()
