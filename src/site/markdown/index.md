@@ -18,16 +18,16 @@ The basic structure of a GeoPackage database is shown in Figure 1.
 
 ![GeoPackage tables](img/geopackage-tables.png)
 
-Several conformance classes are defined:
+The following conformance classes have being defined (In bold the classes that have been implemented):
 
-* Core (Required)
-    - SQLite Container
-    - Spatial Reference Systems
-    - Contents
+* **Core (Required)**
+    - **SQLite Container**
+    - **Spatial Reference Systems**
+    - **Contents**
 * Features
-* Tiles
+* **Tiles**
 * Schema
-* Metadata
+* **Metadata**
 * Registered Extensions
     - Features
     - Tiles
