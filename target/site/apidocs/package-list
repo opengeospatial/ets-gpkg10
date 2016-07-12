@@ -1,0 +1,5 @@
+org.opengis.cite.gpkg10
+org.opengis.cite.gpkg10.core
+org.opengis.cite.gpkg10.metadata
+org.opengis.cite.gpkg10.tiles
+org.opengis.cite.gpkg10.util
