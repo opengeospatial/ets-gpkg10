@@ -35,6 +35,7 @@ public class VerifySQLiteContainerTests {
     public void validHeaderString() throws IOException, SQLException, URISyntaxException {
         URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_sewer_features.gpkg");
         File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
         when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
         SQLiteContainerTests iut = new SQLiteContainerTests();
         iut.initCommonFixture(testContext);
@@ -45,6 +46,7 @@ public class VerifySQLiteContainerTests {
     public void validApplicationId() throws IOException, SQLException, URISyntaxException {
         URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_sewer_features.gpkg");
         File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
         when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
         SQLiteContainerTests iut = new SQLiteContainerTests();
         iut.initCommonFixture(testContext);
