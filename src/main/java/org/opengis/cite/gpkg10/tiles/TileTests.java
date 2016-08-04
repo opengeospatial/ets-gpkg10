@@ -6,15 +6,20 @@ import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
 import org.opengis.cite.gpkg10.ForeignKeyDefinition;
 import org.opengis.cite.gpkg10.TableVerifier;
+import org.opengis.cite.gpkg10.TestRunArg;
 import org.opengis.cite.gpkg10.UniqueDefinition;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
+import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -100,6 +105,16 @@ public class TileTests extends CommonFixture
         }
     }
 
+    @BeforeTest
+    public void validateTileLevelEnabled(ITestContext testContext) throws IOException {
+      Map<String, String> params = testContext.getSuite().getXmlSuite().getParameters();
+      if (params.get(TestRunArg.ICS.toString()).equals("tiles")) {
+        Assert.assertTrue(true);
+      } else {
+        Assert.assertTrue(false, "Tile level is not enabled");
+      }
+    }
+    
     /**
      * The {@code gpkg_contents} table SHALL contain a row with a {@code
      * data_type} column value of "tiles" for each tile pyramid user data
