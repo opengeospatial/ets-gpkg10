@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -57,7 +58,7 @@ public class SQLiteContainerTests extends CommonFixture {
         try (FileInputStream fileInputStream = new FileInputStream(this.gpkgFile)) {
             fileInputStream.read(headerString);
         }
-        assertEquals(headerString, GPKG10.SQLITE_MAGIC_HEADER, ErrorMessage
+        assertTrue(Arrays.equals(headerString, GPKG10.SQLITE_MAGIC_HEADER), ErrorMessage
                 .format(ErrorMessageKeys.INVALID_HEADER_STR, new String(headerString, StandardCharsets.US_ASCII)));
     }
 
@@ -83,7 +84,8 @@ public class SQLiteContainerTests extends CommonFixture {
             fileInputStream.read(headerBytes);
         }
         final byte[] appID = Arrays.copyOfRange(headerBytes, GPKG10.APP_ID_OFFSET, GPKG10.APP_ID_OFFSET + 4);
-        assertEquals(appID, GPKG10.APP_GP10,
+
+        assertTrue(Arrays.equals(appID, GPKG10.APP_GP10),
                 ErrorMessage.format(ErrorMessageKeys.UNKNOWN_APP_ID, new String(appID, StandardCharsets.US_ASCII)));
     }
 
