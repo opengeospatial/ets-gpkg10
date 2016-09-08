@@ -63,7 +63,7 @@ public class SQLiteContainerTests extends CommonFixture {
     }
 
     /**
-     * A GeoPackage shall contain 0x47503130 ("GP10" in UTF-8/ASCII) in the
+     * A GeoPackage shall contain 0x47503130 ("GP10" in UTF-8/ASCII, [71,80,49,48]) in the
      * "Application ID" field of the database header. The field is located at
      * offset 64 (a 32-bit unsigned big-endian integer).
      *
@@ -84,7 +84,6 @@ public class SQLiteContainerTests extends CommonFixture {
             fileInputStream.read(headerBytes);
         }
         final byte[] appID = Arrays.copyOfRange(headerBytes, GPKG10.APP_ID_OFFSET, GPKG10.APP_ID_OFFSET + 4);
-
         assertTrue(Arrays.equals(appID, GPKG10.APP_GP10),
                 ErrorMessage.format(ErrorMessageKeys.UNKNOWN_APP_ID, new String(appID, StandardCharsets.US_ASCII)));
     }
@@ -98,7 +97,7 @@ public class SQLiteContainerTests extends CommonFixture {
     @Test(description = "See OGC 12-128r12: Requirement 3")
     public void filenameExtension() {
         final String fileName = this.gpkgFile.getName();
-        final String suffix = fileName.substring(fileName.indexOf('.'));
+        final String suffix = fileName.substring(fileName.lastIndexOf('.'));
         assertEquals(suffix, GPKG10.GPKG_FILENAME_SUFFIX,
                 ErrorMessage.format(ErrorMessageKeys.INVALID_SUFFIX, suffix));
     }

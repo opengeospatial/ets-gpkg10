@@ -1,8 +1,13 @@
+# Release Notes GeoPackage (gpkg) 1.0
 
-# Release Notes
+## 0.3 (2016-09-08)
+  - [#15](https://github.com/opengeospatial/ets-gpkg10/issues/15) - File extension detection is fooled by periods in file name.
+  - [#13](https://github.com/opengeospatial/ets-gpkg10/issues/13) - NPE with bad application identifier
+  - [#11](https://github.com/opengeospatial/ets-gpkg10/issues/11) - Incorrect failures reported using Team Engine 
 
 ## 0.2 (2016-08-04)
-* [#10](https://github.com/opengeospatial/ets-gpkg10/issues/10) - Example file not passing Core and unexpected passing for Tiles.
+ - [#10](https://github.com/opengeospatial/ets-gpkg10/issues/10) - Example file not passing Core and unexpected passing for Tiles
+  - [#8](https://github.com/opengeospatial/ets-gpkg10/issues/8) - Master not building 
 
 ## 0.1 (2016-06-12)
 The initial release implements the following test conformance classes: Core, tiles and metadata.

@@ -30,6 +30,7 @@
       <item name="Overview" href="index.html" />
       <item name="Release Notes" href="relnotes.html" />
     </menu>
+     <menu ref="reports" />
 
   </body>
 </project>
