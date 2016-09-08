@@ -75,9 +75,9 @@ public class DataContentsTests extends CommonFixture
                         while(pragmaTableInfo.next())
                         {
                             final String dataType = pragmaTableInfo.getString("type");
-                            final boolean correctDataType = ALLOWED_SQL_TYPES.contains(dataType) ||
-                                                            TEXT_TYPE.matcher(dataType).matches() ||
-                                                            BLOB_TYPE.matcher(dataType).matches();
+                            final boolean correctDataType = ALLOWED_SQL_TYPES.contains(dataType.toUpperCase()) ||
+                                                            TEXT_TYPE.matcher(dataType.toUpperCase()).matches() ||
+                                                            BLOB_TYPE.matcher(dataType.toUpperCase()).matches();
 
                             assertTrue(correctDataType,
                                        ErrorMessage.format(ErrorMessageKeys.INVALID_DATA_TYPE,
