@@ -96,7 +96,7 @@ public class SQLiteContainerTests extends CommonFixture {
     @Test(description = "See OGC 12-128r12: Requirement 3")
     public void filenameExtension() {
         final String fileName = this.gpkgFile.getName();
-        final String suffix = fileName.substring(fileName.indexOf('.'));
+        final String suffix = fileName.substring(fileName.lastIndexOf('.'));
         assertEquals(suffix, GPKG10.GPKG_FILENAME_SUFFIX,
                 ErrorMessage.format(ErrorMessageKeys.INVALID_SUFFIX, suffix));
     }
