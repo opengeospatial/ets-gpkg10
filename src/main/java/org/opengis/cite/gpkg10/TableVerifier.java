@@ -74,18 +74,22 @@ public final class TableVerifier
 
             while(indices.next())
             {
-                final String indexName = indices.getString("name");
-                try(Statement nameStatement = connection.createStatement();
-                    ResultSet namesSet      = nameStatement.executeQuery(String.format("PRAGMA index_info(%s);", indexName)))
+                if(indices.getBoolean("unique"))
                 {
-                    final List<String> names = new ArrayList<>();
+                    final String indexName = indices.getString("name");
 
-                    while(namesSet.next())
+                    try(Statement nameStatement = connection.createStatement();
+                        ResultSet namesSet      = nameStatement.executeQuery(String.format("PRAGMA index_info(%s);", indexName)))
                     {
-                        names.add(namesSet.getString("name"));
-                    }
+                        final List<String> names = new ArrayList<>();
 
-                    uniqueDefinitions.add(new UniqueDefinition(names));
+                        while(namesSet.next())
+                        {
+                            names.add(namesSet.getString("name"));
+                        }
+
+                        uniqueDefinitions.add(new UniqueDefinition(names));
+                    }
                 }
             }
 
