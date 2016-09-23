@@ -1,5 +1,9 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
+## 0.4 (2016-MM-DD)
+
+- Fix #25: Content-Type header expected in geopackage response 
+
 ## 0.3 (2016-09-08)
   - [#15](https://github.com/opengeospatial/ets-gpkg10/issues/15) - File extension detection is fooled by periods in file name.
   - [#13](https://github.com/opengeospatial/ets-gpkg10/issues/13) - NPE with bad application identifier

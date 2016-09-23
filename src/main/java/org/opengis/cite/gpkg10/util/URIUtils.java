@@ -89,7 +89,8 @@ public class URIUtils {
         int lastIndexOfDot = uriRef.getPath().lastIndexOf('.');
         // preserve suffix if possible
         String suffix = (lastIndexOfDot > 0) ? uriRef.getPath().substring(lastIndexOfDot) : ".db";
-        if (rsp.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE).endsWith("xml")) {
+        String contentType = rsp.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        if (null != contentType && contentType.endsWith("xml")) {
             suffix = ".xml";
         }
         File destFile = File.createTempFile("gpkg-", suffix);
