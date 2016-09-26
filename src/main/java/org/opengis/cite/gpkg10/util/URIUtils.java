@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.logging.Level;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -89,10 +88,6 @@ public class URIUtils {
         int lastIndexOfDot = uriRef.getPath().lastIndexOf('.');
         // preserve suffix if possible
         String suffix = (lastIndexOfDot > 0) ? uriRef.getPath().substring(lastIndexOfDot) : ".db";
-        String contentType = rsp.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
-        if (null != contentType && contentType.endsWith("xml")) {
-            suffix = ".xml";
-        }
         File destFile = File.createTempFile("gpkg-", suffix);
         if (rsp.hasEntity()) {
             InputStream is = rsp.getEntityInputStream();
