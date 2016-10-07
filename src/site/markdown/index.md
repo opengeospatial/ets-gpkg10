@@ -4,7 +4,7 @@
 ## Scope
 
 This conformance test suite verifies the structure and content of a GeoPackage 1.0 
-data container. The [GeoPackage specification](http://www.geopackage.org/spec/) describes 
+data container. The [GeoPackage 1.0 specification](http://www.opengis.net/doc/IS/geopackage/1.0) describes 
 how a platform-independent [SQLite database file](https://www.sqlite.org/fileformat2.html) 
 may contain various types of content, including:
 
@@ -31,6 +31,8 @@ The following conformance classes have being defined (In bold the classes that h
 * Registered Extensions
     - Features
     - Tiles
+    
+Note: This test doesn’t support GeoPackage 1.1. To follow the issue or support the development of a 1.1 test, please  provide a comment in the [GitHub issue tracker](https://github.com/opengeospatial/ets-gpkg10/issues/4).   
 
 ## Test requirements
 
