@@ -1,5 +1,7 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
+## 1.0 (2016-12)
+   - [#27](https://github.com/opengeospatial/ets-gpkg10/issues/27) - Tag 1.0 - Test got approved by OGC TC
 
 ## 0.4 (2016-10-07)
 
