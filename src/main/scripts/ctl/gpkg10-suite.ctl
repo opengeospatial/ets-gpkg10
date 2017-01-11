@@ -59,9 +59,9 @@
                </p>
                <p>
                  <label for="level">Conformance class: </label>
-                 <input id="core" type="radio" name="level" value="core" checked="checked" />
+                 <input id="core" type="checkbox" name="level" value="core" checked="checked" onclick="return this.checked;" />
                  <label for="core"> Core | </label>
-                 <input id="tiles" type="radio" name="level" value="tiles" />
+                 <input id="tiles" type="checkbox" name="level" value="tiles" />
                  <label class="form-label" for="tiles"> Tiles</label>
                </p>
              </fieldset>
