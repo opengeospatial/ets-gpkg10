@@ -22,4 +22,9 @@
       <package name="org.opengis.cite.gpkg10.tiles" />
     </packages>
   </test>
+  <test name="Metadata">
+    <packages>
+      <package name="org.opengis.cite.gpkg10.metadata" />
+    </packages>
+  </test>
 </suite>
