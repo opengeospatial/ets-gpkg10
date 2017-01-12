@@ -1,8 +1,9 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
-## 1.0 (2016-12)
+## 1.0 (2017-01)
    - [#27](https://github.com/opengeospatial/ets-gpkg10/issues/27) - Tag 1.0 - Test got approved by OGC TC
-
+   - [#28](https://github.com/opengeospatial/ets-gpkg10/issues/28) - Selection of conformance classes
+   
 ## 0.4 (2016-10-07)
 
   - [#25](https://github.com/opengeospatial/ets-gpkg10/issues/25) - Content-Type header expected in geopackage response
