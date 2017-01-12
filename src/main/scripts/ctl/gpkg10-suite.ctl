@@ -59,10 +59,12 @@
                </p>
                <p>
                  <label for="level">Conformance class: </label>
-                 <input id="core" type="checkbox" name="level" value="core" checked="checked" onclick="return this.checked;" />
+                 <input id="core" type="checkbox" name="level" value="1" checked="checked" onclick="return this.checked;" />
                  <label for="core"> Core | </label>
-                 <input id="tiles" type="checkbox" name="level" value="tiles" />
-                 <label class="form-label" for="tiles"> Tiles</label>
+                 <input id="tiles" type="checkbox" name="level" value="2" />
+                 <label class="form-label" for="tiles"> Tiles | </label>
+                 <input id="metadata" type="checkbox" name="level" value="3" />
+                 <label class="form-label" for="metadata"> Metadata </label>
                </p>
              </fieldset>
              <p>

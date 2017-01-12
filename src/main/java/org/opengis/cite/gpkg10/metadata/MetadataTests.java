@@ -6,10 +6,15 @@ import org.opengis.cite.gpkg10.ErrorMessage;
 import org.opengis.cite.gpkg10.ErrorMessageKeys;
 import org.opengis.cite.gpkg10.ForeignKeyDefinition;
 import org.opengis.cite.gpkg10.TableVerifier;
+import org.opengis.cite.gpkg10.TestRunArg;
 import org.opengis.cite.gpkg10.util.DatabaseUtility;
+import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -89,6 +94,17 @@ public class MetadataTests extends CommonFixture
         }
     }
 
+    @BeforeTest
+    public void validateMetadataLevelEnabled(ITestContext testContext) throws IOException {
+      Map<String, String> params = testContext.getSuite().getXmlSuite().getParameters();
+      int level = Integer.parseInt(params.get(TestRunArg.ICS.toString()));
+      if (level > 2) {
+        Assert.assertTrue(true);
+      } else {
+        Assert.assertTrue(false, "Metadata level is not enabled");
+      }
+    }
+    
     /**
      * A GeoPackage MAY contain a table named gpkg_metadata. If present it
      * SHALL be defined per clause 2.4.2.1.1 <a href=

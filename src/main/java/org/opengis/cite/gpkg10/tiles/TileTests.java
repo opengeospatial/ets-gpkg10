@@ -108,7 +108,8 @@ public class TileTests extends CommonFixture
     @BeforeTest
     public void validateTileLevelEnabled(ITestContext testContext) throws IOException {
       Map<String, String> params = testContext.getSuite().getXmlSuite().getParameters();
-      if (params.get(TestRunArg.ICS.toString()).equals("tiles")) {
+      int level = Integer.parseInt(params.get(TestRunArg.ICS.toString()));
+      if (level > 1) {
         Assert.assertTrue(true);
       } else {
         Assert.assertTrue(false, "Tile level is not enabled");
