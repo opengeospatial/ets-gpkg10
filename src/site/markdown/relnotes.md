@@ -1,5 +1,8 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
+## 1.1 (2017-02)
+   - [#32](https://github.com/opengeospatial/ets-gpkg10/issues/32) - Version 1.0 of the test shows status Beta, status should be Final
+    
 ## 1.0 (2017-01)
    - [#27](https://github.com/opengeospatial/ets-gpkg10/issues/27) - Tag 1.0 - Test got approved by OGC TC
    - [#28](https://github.com/opengeospatial/ets-gpkg10/issues/28) - Selection of conformance classes
