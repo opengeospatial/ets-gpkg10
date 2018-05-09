@@ -12,6 +12,9 @@
         <local-name>ets-gpkg10-${version}</local-name>
         <title>GeoPackage 1.0 Conformance Test Suite</title>
         <description>Verifies the structure and content of a GeoPackage 1.0 data container.</description>
+        <BasicConformanceClasses>
+          <conformanceClass>Core</conformanceClass>
+        </BasicConformanceClasses>
       </suite>
       <revision>
         <name>${version}</name>
