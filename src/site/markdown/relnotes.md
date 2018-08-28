@@ -1,6 +1,8 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
-## 1.1 (2017-02)
+## 1.1 (2018-08)
+   - [#33](https://github.com/opengeospatial/ets-gpkg10/issues/33) - Add conformance class configuration into the gpkg10 test.
+   - [#34](https://github.com/opengeospatial/ets-gpkg10/pull/34) - Make Tile schema test match 12-128r12 Table 11
    - [#32](https://github.com/opengeospatial/ets-gpkg10/issues/32) - Version 1.0 of the test shows status Beta, status should be Final
     
 ## 1.0 (2017-01)
