@@ -1,5 +1,10 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
+## 1.2 (2022-03)
+   - [#39](https://github.com/opengeospatial/ets-gpkg10/issues/39) - Add template to get an XML/JSON response via rest endpoint
+   - [#37](https://github.com/opengeospatial/ets-gpkg10/issues/37) - Cleanup dependencies
+   - [#42](https://github.com/opengeospatial/ets-gpkg10/pull/42) - Bump xercesImpl from 2.11.0 to 2.12.2
+
 ## 1.1 (2018-08)
    - [#33](https://github.com/opengeospatial/ets-gpkg10/issues/33) - Add conformance class configuration into the gpkg10 test.
    - [#34](https://github.com/opengeospatial/ets-gpkg10/pull/34) - Make Tile schema test match 12-128r12 Table 11
