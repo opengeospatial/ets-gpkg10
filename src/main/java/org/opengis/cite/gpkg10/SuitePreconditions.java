@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.testng.Assert;
-import org.testng.ITestContext;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -26,15 +26,17 @@ public class SuitePreconditions {
 	 * at offset 96; it resolves to an integer with the value (X*1000000 + Y*1000 + Z)
 	 * where X, Y, and Z are the same numbers used in SQLITE_VERSION. The major version
 	 * number, X, is always 3 for SQLite3.
-	 * @param testContext Information about the (pending) test run.
 	 * @throws java.io.IOException If an I/O error occurs while trying to read the data
 	 * file.
 	 */
 	@BeforeSuite
 	@SuppressWarnings("rawtypes")
-	public void verifySQLiteMajorVersion(ITestContext testContext) throws IOException {
+	public void verifySQLiteMajorVersion() throws IOException {
 		SuiteAttribute testFileAttr = SuiteAttribute.TEST_SUBJ_FILE;
-		Object sutObj = testContext.getSuite().getAttribute(testFileAttr.getName());
+		Object sutObj = Reporter.getCurrentTestResult()
+			.getTestContext()
+			.getSuite()
+			.getAttribute(testFileAttr.getName());
 		Class expectedType = testFileAttr.getType();
 		if (null != sutObj && expectedType.isInstance(sutObj)) {
 			File dataFile = File.class.cast(sutObj);
