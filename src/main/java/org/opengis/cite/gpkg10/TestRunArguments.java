@@ -1,10 +1,11 @@
 package org.opengis.cite.gpkg10;
 
-import com.beust.jcommander.Parameter;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.beust.jcommander.Parameter;
 
 /**
  * Declares supported command line arguments that are parsed using the

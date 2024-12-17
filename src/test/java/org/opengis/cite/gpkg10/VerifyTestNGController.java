@@ -1,6 +1,6 @@
 package org.opengis.cite.gpkg10;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,13 +14,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 
-import net.sf.saxon.s9api.XdmValue;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.cite.gpkg10.util.XMLUtils;
 import org.w3c.dom.Document;
+
+import net.sf.saxon.s9api.XdmValue;
 
 /**
  * Verifies the results of executing a test run using the main controller

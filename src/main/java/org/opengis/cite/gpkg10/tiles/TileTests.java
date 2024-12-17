@@ -1,24 +1,7 @@
 package org.opengis.cite.gpkg10.tiles;
 
-import org.opengis.cite.gpkg10.ColumnDefinition;
-import org.opengis.cite.gpkg10.CommonFixture;
-import org.opengis.cite.gpkg10.ErrorMessage;
-import org.opengis.cite.gpkg10.ErrorMessageKeys;
-import org.opengis.cite.gpkg10.ForeignKeyDefinition;
-import org.opengis.cite.gpkg10.TableVerifier;
-import org.opengis.cite.gpkg10.TestRunArg;
-import org.opengis.cite.gpkg10.UniqueDefinition;
-import org.opengis.cite.gpkg10.util.DatabaseUtility;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.MemoryCacheImageInputStream;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,8 +23,25 @@ import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+
+import org.opengis.cite.gpkg10.ColumnDefinition;
+import org.opengis.cite.gpkg10.CommonFixture;
+import org.opengis.cite.gpkg10.ErrorMessage;
+import org.opengis.cite.gpkg10.ErrorMessageKeys;
+import org.opengis.cite.gpkg10.ForeignKeyDefinition;
+import org.opengis.cite.gpkg10.TableVerifier;
+import org.opengis.cite.gpkg10.TestRunArg;
+import org.opengis.cite.gpkg10.UniqueDefinition;
+import org.opengis.cite.gpkg10.util.DatabaseUtility;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * Defines test methods that apply to descriptive information about a

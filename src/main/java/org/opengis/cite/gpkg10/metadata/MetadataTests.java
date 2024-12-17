@@ -1,5 +1,22 @@
 package org.opengis.cite.gpkg10.metadata;
 
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.opengis.cite.gpkg10.ColumnDefinition;
 import org.opengis.cite.gpkg10.CommonFixture;
 import org.opengis.cite.gpkg10.ErrorMessage;
@@ -13,25 +30,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
 
 /**
  * Defines test methods that apply to descriptive information about a

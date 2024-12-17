@@ -1,23 +1,22 @@
 package org.opengis.cite.gpkg10.core;
 
-import org.opengis.cite.gpkg10.CommonFixture;
-import org.opengis.cite.gpkg10.ErrorMessage;
-import org.opengis.cite.gpkg10.ErrorMessageKeys;
-import org.opengis.cite.gpkg10.GPKG10;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
+import org.opengis.cite.gpkg10.CommonFixture;
+import org.opengis.cite.gpkg10.ErrorMessage;
+import org.opengis.cite.gpkg10.ErrorMessageKeys;
+import org.opengis.cite.gpkg10.GPKG10;
+import org.testng.annotations.Test;
 
 /**
  * Defines test methods that apply to an SQLite database file. The GeoPackage

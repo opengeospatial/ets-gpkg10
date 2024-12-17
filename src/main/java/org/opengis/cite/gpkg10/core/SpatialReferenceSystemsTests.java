@@ -1,11 +1,7 @@
 package org.opengis.cite.gpkg10.core;
 
-import org.opengis.cite.gpkg10.ColumnDefinition;
-import org.opengis.cite.gpkg10.CommonFixture;
-import org.opengis.cite.gpkg10.ErrorMessage;
-import org.opengis.cite.gpkg10.ErrorMessageKeys;
-import org.opengis.cite.gpkg10.TableVerifier;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,8 +13,12 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
+import org.opengis.cite.gpkg10.ColumnDefinition;
+import org.opengis.cite.gpkg10.CommonFixture;
+import org.opengis.cite.gpkg10.ErrorMessage;
+import org.opengis.cite.gpkg10.ErrorMessageKeys;
+import org.opengis.cite.gpkg10.TableVerifier;
+import org.testng.annotations.Test;
 
 /**
  * Defines test methods that apply to spatial reference systems defined in a

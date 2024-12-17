@@ -1,15 +1,16 @@
 package org.opengis.cite.gpkg10;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * A supporting base class that sets up a common test fixture. These
