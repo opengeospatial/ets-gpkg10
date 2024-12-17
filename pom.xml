@@ -128,7 +128,7 @@
                 <build>
                   <dockerFileDir>${project.basedir}/src/docker</dockerFileDir>
                   <tags>
-                    <tag>${project.version}-teamengine-${docker.teamengine.version}</tag>
+                    <tag>${project.version}-teamengine-${teamengine.version}</tag>
                   </tags>
                   <assembly>
                     <inline>
