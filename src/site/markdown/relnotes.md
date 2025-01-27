@@ -1,5 +1,11 @@
 # Release Notes GeoPackage (gpkg) 1.0
 
+## 1.3 (2025-01)
+
+Attention: Java 17 and Tomcat 10.1 are required.
+
+   - [#44](https://github.com/opengeospatial/ets-gpkg10/issues/44) - Migrate test suite to TEAM Engine 6 (Java 17)
+
 ## 1.2 (2022-03)
    - [#39](https://github.com/opengeospatial/ets-gpkg10/issues/39) - Add template to get an XML/JSON response via rest endpoint
    - [#37](https://github.com/opengeospatial/ets-gpkg10/issues/37) - Cleanup dependencies
@@ -32,5 +38,4 @@
 
 ## 0.1 (2016-06-12)
 The initial release implements the following test conformance classes: Core, tiles and metadata.
- 
 
