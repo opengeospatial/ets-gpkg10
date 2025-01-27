@@ -23,92 +23,100 @@
 package org.opengis.cite.gpkg10;
 
 /**
- * @author Luke Lambert
+ * <p>
+ * ForeignKeyDefinition class.
+ * </p>
  *
+ * @author Luke Lambert
  */
-public class ForeignKeyDefinition
-{
-    /**
-     * @param referenceTableName the table name with the foreign key constraint
-     * @param fromColumnName the name of the column that the link between two tables is from
-     * @param toColumnName the name of the column that the link between two tables is to
-     */
-    public ForeignKeyDefinition(final String referenceTableName, final String fromColumnName, final String toColumnName)
-    {
-        if(referenceTableName == null || referenceTableName.isEmpty())
-        {
-            throw new IllegalArgumentException("Reference table name may not be null or empty");
-        }
+public class ForeignKeyDefinition {
 
-        if(fromColumnName == null || fromColumnName.isEmpty())
-        {
-            throw new IllegalArgumentException("From column name table name may not be null or empty");
-        }
+	/**
+	 * <p>
+	 * Constructor for ForeignKeyDefinition.
+	 * </p>
+	 * @param referenceTableName the table name with the foreign key constraint
+	 * @param fromColumnName the name of the column that the link between two tables is
+	 * from
+	 * @param toColumnName the name of the column that the link between two tables is to
+	 */
+	public ForeignKeyDefinition(final String referenceTableName, final String fromColumnName,
+			final String toColumnName) {
+		if (referenceTableName == null || referenceTableName.isEmpty()) {
+			throw new IllegalArgumentException("Reference table name may not be null or empty");
+		}
 
-        if(toColumnName == null || toColumnName.isEmpty())
-        {
-            throw new IllegalArgumentException("To column name may not be null or empty");
-        }
+		if (fromColumnName == null || fromColumnName.isEmpty()) {
+			throw new IllegalArgumentException("From column name table name may not be null or empty");
+		}
 
-        this.referenceTableName = referenceTableName;
-        this.fromColumnName     = fromColumnName;
-        this.toColumnName       = toColumnName;
-    }
+		if (toColumnName == null || toColumnName.isEmpty()) {
+			throw new IllegalArgumentException("To column name may not be null or empty");
+		}
 
-    @Override
-    public boolean equals(final Object object)
-    {
-        if(!(object instanceof ForeignKeyDefinition))
-        {
-            return false;
-        }
+		this.referenceTableName = referenceTableName;
+		this.fromColumnName = fromColumnName;
+		this.toColumnName = toColumnName;
+	}
 
-        if(object == this)
-        {
-            return true;
-        }
+	/** {@inheritDoc} */
+	@Override
+	public boolean equals(final Object object) {
+		if (!(object instanceof ForeignKeyDefinition)) {
+			return false;
+		}
 
-        final ForeignKeyDefinition other = (ForeignKeyDefinition)object;
+		if (object == this) {
+			return true;
+		}
 
-        return this.referenceTableName.equals(other.referenceTableName) &&
-               this.    fromColumnName.equals(other.    fromColumnName) &&
-               this.      toColumnName.equals(other.      toColumnName);
+		final ForeignKeyDefinition other = (ForeignKeyDefinition) object;
 
-    }
+		return this.referenceTableName.equals(other.referenceTableName)
+				&& this.fromColumnName.equals(other.fromColumnName) && this.toColumnName.equals(other.toColumnName);
 
-    @Override
-    public int hashCode()
-    {
-        return this.referenceTableName.hashCode() ^
-               this.    fromColumnName.hashCode() ^
-               this.      toColumnName.hashCode();
-    }
+	}
 
-    /**
-     * @return the referenceTableName
-     */
-    public String getReferenceTableName()
-    {
-        return this.referenceTableName;
-    }
+	/** {@inheritDoc} */
+	@Override
+	public int hashCode() {
+		return this.referenceTableName.hashCode() ^ this.fromColumnName.hashCode() ^ this.toColumnName.hashCode();
+	}
 
-    /**
-     * @return the fromColumnName
-     */
-    public String getFromColumnName()
-    {
-        return this.fromColumnName;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>referenceTableName</code>.
+	 * </p>
+	 * @return the referenceTableName
+	 */
+	public String getReferenceTableName() {
+		return this.referenceTableName;
+	}
 
-    /**
-     * @return the toColumnName
-     */
-    public String getToColumnName()
-    {
-        return this.toColumnName;
-    }
+	/**
+	 * <p>
+	 * Getter for the field <code>fromColumnName</code>.
+	 * </p>
+	 * @return the fromColumnName
+	 */
+	public String getFromColumnName() {
+		return this.fromColumnName;
+	}
 
-    private final String referenceTableName;
-    private final String     fromColumnName;
-    private final String       toColumnName;
+	/**
+	 * <p>
+	 * Getter for the field <code>toColumnName</code>.
+	 * </p>
+	 * @return the toColumnName
+	 */
+	public String getToColumnName() {
+		return this.toColumnName;
+	}
+
+	private final String referenceTableName;
+
+	private final String fromColumnName;
+
+	private final String toColumnName;
+
 }
